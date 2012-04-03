@@ -11,12 +11,11 @@ class Process(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        global _removePrivate, currentTags, baseTags, currentTags, currentPatient, checkedTags, currentTag, focusedTag, tagChanges, cachedTags
+        global _removePrivate, baseTags, currentPatient, checkedTags, focusedTag, tagChanges, cachedTags
         
         checkedTags     = []
         tagChanges      = []
         currentPatient  = ""
-        currentTag      = {}
         focusedTag      = ""
         
         self.tagGroups  = ["0008", "0010 : Patient Information", "0012 : Clinical Information ", "0014", "0018", "0020", "0022", "0024", "0028",
@@ -69,7 +68,6 @@ class Process(wx.Panel):
         self.tagLBox = wx.ListBox(self, 131, size=(600,140), style=wx.TE_MULTILINE)
         
         # Check List Box
-        self.currentTags = []
         self.tagCLBox = wx.CheckListBox(self, 111, size=(600,255), choices=cachedTags, style=0)
         
         # Layout
@@ -121,7 +119,7 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=112)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
-        self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change)
+        #self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change)
         
         # Initial Settings
         self.SetSizer(self.container)
@@ -154,27 +152,24 @@ class Process(wx.Panel):
     # self.editTC & self.chgBtn
     def change(self, event):
         global focusedTag, baseTags, checkedTags, fTag, tagChanges
-        
-        self.editTcValue = self.editTc.GetValue()
-        fTag = focusedTag
-        currentTag[fTag] = self.editTcValue
-        print currentTag.items()
-        
-        for tag in currentTag.items():
-            for pair in tagChanges:
-                if tag[0] == pair[0]:
-                    pair[1] = tag[1]
-                    print 'xxxxxxxxxxxx'
-                else:
-                    tagChanges.append(tag)
 
+        fTag = focusedTag
+        self.value = self.editTc.GetValue()
+        self.currentPair = [fTag, self.value] 
+        tagChanges.append(self.currentPair)
+        
+        for pair in tagChanges:
+            print pair
+            print self.currentPair
+            if fTag == pair[0]:
+                tagChanges.remove(pair)
+                tagChanges.append(self.currentPair)
             
         self.refreshChecklist()
         
-        
     # Helper function for change
     def refreshChecklist(self):
-        global baseTags, fTag, cachedTags
+        global baseTags, fTag, cachedTags, tagChanges
         
         self.curSelc    = self.tagsDrop.GetValue()[:4]
         self.checked    = self.tagCLBox.GetChecked()
@@ -196,7 +191,9 @@ class Process(wx.Panel):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
 
-        self.editTc.SetValue(currentTag[fTag])
+        for pair in tagChanges:
+            if fTag == pair[0]:
+                self.editTc.SetValue(pair[1])
     
     # self.preBtn           
     def loadPrev(self, event):
@@ -280,7 +277,7 @@ class Process(wx.Panel):
             print e
             
         print "checkedTags : " + str(checkedTags)
-        print "tagChanages : " + str(tagChanges)
+        print "tagChanges : " + str(tagChanges)
         
     def mapper(self, event):
         global tPath, baseTags
@@ -454,7 +451,7 @@ def _genTags():
             
 # ------------------------------
 if __name__ == "__main__":
-    global baseTags, currentTags, cachedTags
+    global baseTags, cachedTags
     
     _genTags()
     
