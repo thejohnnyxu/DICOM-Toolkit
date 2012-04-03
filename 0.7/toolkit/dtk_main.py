@@ -6,17 +6,18 @@ logic = dtk_logic.Logic()
 
 # ------------------------------
 class Process(wx.Panel):
-    tagSet      = []
-    focusedTag  = ''
+    cachedTags      = []
+    checkedTags     = []
+    currentPatient  = ""
+    focusedTag      = ""
+    tagChanges      = []
+    tagSet          = []
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        global _removePrivate, baseTags, currentPatient, checkedTags, focusedTag, tagChanges, cachedTags
+        global baseTags, currentPatient, checkedTags, focusedTag, tagChanges, cachedTags
         
-        checkedTags     = []
-        tagChanges      = []
-        currentPatient  = ""
-        focusedTag      = ""
+        
         
         self.tagGroups  = ["0008", "0010 : Patient Information", "0012 : Clinical Information ", "0014", "0018", "0020", "0022", "0024", "0028",
                         "0032", "0038", "003A", "0040", "0042", "0044", "0046", "0048", "0050",
@@ -145,31 +146,29 @@ class Process(wx.Panel):
         self.tagTc.SetValue(focusedTag)
         
         if self.tagCLBox.IsChecked(self.id):
-            checkedTags.append(self.tag)
+            if self.tag not in checkedTags:
+                checkedTags.append(self.tag)
         else:
             checkedTags.remove(self.tag)
         
     # self.editTC & self.chgBtn
     def change(self, event):
-        global focusedTag, baseTags, checkedTags, fTag, tagChanges
+        global focusedTag, baseTags, checkedTags, tagChanges
 
-        fTag = focusedTag
         self.value = self.editTc.GetValue()
-        self.currentPair = [fTag, self.value] 
+        self.currentPair = [focusedTag, self.value]
+        
         tagChanges.append(self.currentPair)
         
         for pair in tagChanges:
-            print pair
-            print self.currentPair
-            if fTag == pair[0]:
+            if focusedTag == pair[0]:
                 tagChanges.remove(pair)
-                tagChanges.append(self.currentPair)
             
         self.refreshChecklist()
         
     # Helper function for change
     def refreshChecklist(self):
-        global baseTags, fTag, cachedTags, tagChanges
+        global baseTags, cachedTags, tagChanges, focusedTag
         
         self.curSelc    = self.tagsDrop.GetValue()[:4]
         self.checked    = self.tagCLBox.GetChecked()
@@ -192,7 +191,7 @@ class Process(wx.Panel):
                     self.tagCLBox.Check(idx2)
 
         for pair in tagChanges:
-            if fTag == pair[0]:
+            if focusedTag == pair[0]:
                 self.editTc.SetValue(pair[1])
     
     # self.preBtn           
