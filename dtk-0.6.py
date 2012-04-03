@@ -409,9 +409,7 @@ class Batch(wx.Panel):
         self.patDrop.Clear()
         for e in finalPats:
             self.patDrop.Append(e)
-            
-        
-                    
+ 
     def tester(self, event):
         global finalPats
         pass

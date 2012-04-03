@@ -43,7 +43,7 @@ class Logic():
                 _srTime = ""
         
             group = (_name, _stDesc, _stID, _srDesc, _srNum, _srTime)
-        
+
             if group not in patients:
                 patients.append(group)            
     
@@ -82,20 +82,12 @@ class Logic():
             self.checkedList = []
             self.newValues   = []
             
-            rootPatient = tagSetItem(self.patientName, self.checkedList, self.newValues)
+            rootPatient = [self.patientName, self.checkedList, self.newValues]
+            
             if rootPatient not in ui.tagSet:
                 ui.tagSet.append(rootPatient)
                 print ui.tagSet
                 
-class tagSetItem(object):
-    name = ""
-    checked = []
-    new = []
-    
-    
-    
-        
-            
 
 if __name__ == "__main__":
     pass
