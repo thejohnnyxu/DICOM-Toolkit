@@ -6,18 +6,17 @@ logic = dtk_logic.Logic()
 
 # ------------------------------
 class Process(wx.Panel):
+    
     cachedTags      = []
     checkedTags     = []
     currentPatient  = ""
     focusedTag      = ""
     tagChanges      = []
     tagSet          = []
+    editPair        = {}
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        global baseTags, currentPatient, checkedTags, focusedTag, tagChanges, cachedTags
-        
-        
         
         self.tagGroups  = ["0008", "0010 : Patient Information", "0012 : Clinical Information ", "0014", "0018", "0020", "0022", "0024", "0028",
                         "0032", "0038", "003A", "0040", "0042", "0044", "0046", "0048", "0050",
@@ -60,17 +59,17 @@ class Process(wx.Panel):
         self.patientDrop = wx.ComboBox(self, 122, size=(600, 25), choices=[], style=wx.CB_READONLY)
         
         # Checkbox
-        self.privateCheck = wx.CheckBox(self, 112, "Remove Private Tags")
+        self.privateCheck = wx.CheckBox(self, 131, "Remove Private Tags")
         
         # Dialog
         self.proDlg = wx.MessageDialog(self, 'This may take a few minutes to finish.', 'Processing DICOM Files...', wx.OK|wx.ICON_INFORMATION)
         
         # List Box
-        self.tagLBox = wx.ListBox(self, 131, size=(600,140), style=wx.TE_MULTILINE)
+        self.tagLBox = wx.ListBox(self, 141, size=(600,140), style=wx.TE_MULTILINE)
         
         # Check List Box
-        self.tagCLBox = wx.CheckListBox(self, 111, size=(600,255), choices=cachedTags, style=0)
-        
+        self.tagCLBox = wx.CheckListBox(self, 151, size=(600,255), choices=Process.cachedTags, style=0)
+ 
         # Layout
         self.container.Add(self.hboxA)
         self.container.AddSpacer((1,5))
@@ -115,12 +114,12 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.remove,       id=105)
         self.Bind(wx.EVT_BUTTON, self.batch,        id=106)
         self.Bind(wx.EVT_BUTTON, self.mapper,       id=107)
-        self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=111)
-        self.Bind(wx.EVT_LISTBOX, self.clicked,     id=111)
-        self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=112)
+        self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=151)
+        self.Bind(wx.EVT_LISTBOX, self.clicked,     id=151)
+        self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=131)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
-        #self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change)
+        self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change, id=111)
         
         # Initial Settings
         self.SetSizer(self.container)
@@ -135,44 +134,42 @@ class Process(wx.Panel):
     
     # self.checklistbox
     def clicked(self, event):
-        global checkedTags, focusedTag
         
         self.id     = event.GetSelection()
-        focusedTag  = self.tagCLBox.GetString(self.tagCLBox.GetSelection())
-        self.key    = focusedTag[:-1]
+        Process.focusedTag  = self.tagCLBox.GetString(self.tagCLBox.GetSelection())      
         self.tag    = str(self.tagCLBox.GetString(self.id))
         
         self.tagCLBox.Check(self.id)
-        self.tagTc.SetValue(focusedTag)
+        self.tagTc.SetValue(Process.focusedTag)
         
         if self.tagCLBox.IsChecked(self.id):
-            if self.tag not in checkedTags:
-                checkedTags.append(self.tag)
+            if self.tag not in Process.checkedTags:
+                Process.checkedTags.append(self.tag)
         else:
-            checkedTags.remove(self.tag)
+            Process.checkedTags.remove(self.tag)
+            
+        if Process.editPair.has_key(Process.focusedTag):
+            self.editTc.SetValue(Process.editPair[Process.focusedTag])
+        else:
+            self.editTc.Clear()
+        
         
     # self.editTC & self.chgBtn
     def change(self, event):
-        global focusedTag, baseTags, checkedTags, tagChanges
-
+        global baseTags
+        
         self.value = self.editTc.GetValue()
-        self.currentPair = [focusedTag, self.value]
-        
-        tagChanges.append(self.currentPair)
-        
-        for pair in tagChanges:
-            if focusedTag == pair[0]:
-                tagChanges.remove(pair)
-            
+        Process.editPair[Process.focusedTag] = self.value
+
         self.refreshChecklist()
+        self.editTc.Clear()
         
     # Helper function for change
     def refreshChecklist(self):
-        global baseTags, cachedTags, tagChanges, focusedTag
         
-        self.curSelc    = self.tagsDrop.GetValue()[:4]
-        self.checked    = self.tagCLBox.GetChecked()
-        cachedTags      = []        
+        self.curSelc        = self.tagsDrop.GetValue()[:4]
+        self.checked        = self.tagCLBox.GetChecked()
+        Process.cachedTags  = []        
         
         self.tagCLBox.Clear()
         
@@ -180,18 +177,18 @@ class Process(wx.Panel):
         for pair in baseTags:
             self.word = str(pair[0])
             if self.word[1:5] == self.curSelc:
-                cachedTags.append(pair[1])
+                Process.cachedTags.append(pair[1])
         
-        self.tagCLBox.InsertItems(items=cachedTags, pos=0)
+        self.tagCLBox.InsertItems(items=Process.cachedTags, pos=0)
         
-        # Checks all tags from _checkedTags in _cacheTags
-        for idx1, val1, in enumerate(checkedTags):
-            for idx2, val2, in enumerate(cachedTags):
+        # Checks all tags from _Process.checkedTags in _cacheTags
+        for idx1, val1, in enumerate(Process.checkedTags):
+            for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
 
-        for pair in tagChanges:
-            if focusedTag == pair[0]:
+        for pair in Process.tagChanges:
+            if Process.focusedTag == pair[0]:
                 self.editTc.SetValue(pair[1])
     
     # self.preBtn           
@@ -200,57 +197,56 @@ class Process(wx.Panel):
     
     # self.tagdrop
     def onSelect(self, event):
-        global cachedTags
         
         self.groupSelc  = self.tagsDrop.GetValue()[:4]
         self.checked    = self.tagCLBox.GetChecked()
         
-        cachedTags  = []
+        Process.cachedTags  = []
         
         self.tagCLBox.Clear()
         
-        # Populates cachedTags
+        # Populates Process.cachedTags
         for pair in baseTags:
             self.word = str(pair[0])
             if self.word[1:5] == self.groupSelc:
-                cachedTags.append(pair[1])
+                Process.cachedTags.append(pair[1])
         
-        self.tagCLBox.InsertItems(items=cachedTags, pos=0)
+        self.tagCLBox.InsertItems(items=Process.cachedTags, pos=0)
         
-        # Checks all tags from checkedTags in cachedTags
-        for idx1, val1, in enumerate(checkedTags):
-            for idx2, val2, in enumerate(cachedTags):
+        # Checks all tags from Process.checkedTags in Process.cachedTags
+        for idx1, val1, in enumerate(Process.checkedTags):
+            for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
                         
     def setPatient(self, event):
-        global currentPatient, checkedTags, tagChanges, baseTags, cachedTags
-        
-        self.patientSelc = self.patientDrop.GetValue()
-        currentPatient = self.patientSelc
+
+        Process.currentPatient = self.patientDrop.GetValue()
         
         # Uncheck everything
-        for idx1, val1, in enumerate(cachedTags):
+        for idx1, val1, in enumerate(Process.cachedTags):
             self.tagCLBox.Check(idx1, 0)
                     
-        # Clears cachedTags
-        cachedTags = []
+        # Clears Process.cachedTags
+        Process.cachedTags = []
         
-        # Sets checkedTags and tagChanges for the currentPatient
+        # Sets Process.checkedTags and Process.tagChanges for the Process.currentPatient
         for pat in Process.tagSet:
-            if pat[0] == currentPatient:
-                checkedTags = pat[1]
-                tagChanges = pat[2]
-
-        for idx1, val1, in enumerate(checkedTags):
-            for idx2, val2, in enumerate(cachedTags):
+            if pat[0] == Process.currentPatient:
+                Process.checkedTags = pat[1]
+                Process.tagChanges = pat[2]
+                
+        for idx1, val1, in enumerate(Process.checkedTags):
+            for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
-                    
+        
         for pat in Process.tagSet:
-            if pat[0] == currentPatient:
-                pat[1] = checkedTags
-                pat[2] = tagChanges
+            if pat[0] == Process.currentPatient:
+                pat[1] = Process.checkedTags
+                pat[2] = list(Process.editPair.items())
+                    
+        
                 
         self.refreshChecklist()
                        
@@ -271,15 +267,22 @@ class Process(wx.Panel):
         pass
         
     def batch(self, event):
-        global currentPatient, checkedTags, tagChanges, baseTags, cachedTags
+        global baseTags
         for e in Process.tagSet:
             print e
             
-        print "checkedTags : " + str(checkedTags)
-        print "tagChanges : " + str(tagChanges)
+        print "Process.checkedTags : " + str(Process.checkedTags)
+        print "Process.tagChanges : " + str(Process.tagChanges)
         
     def mapper(self, event):
         global tPath, baseTags
+        
+        Process.tagChanges  = []
+        Process.checkedTags = []
+        
+        # Uncheck everything
+        for idx1, val1, in enumerate(Process.cachedTags):
+            self.tagCLBox.Check(idx1, 0)
         
         for dirname, dirs, files, in sListing:
             for filename in files:
@@ -433,10 +436,10 @@ class MainFrame(wx.Frame):
 
 # ------------------------------
 def _genTags():
-    global baseTags, cachedTags
+    global baseTags
     
-    baseTags    = []
-    cachedTags = []
+    baseTags            = []
+    Process.cachedTags  = []
     
     tags = open('tags.txt', 'r').readlines()
     
@@ -450,14 +453,14 @@ def _genTags():
             
 # ------------------------------
 if __name__ == "__main__":
-    global baseTags, cachedTags
+    global baseTags
     
     _genTags()
     
     for pair in baseTags:
         _word = str(pair[0])[1:5]
         if _word == "0010":
-            cachedTags.append(pair[1])
+            Process.cachedTags.append(pair[1])
     
     app = wx.App(0)
     MainFrame().Show()
