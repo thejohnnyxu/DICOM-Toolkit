@@ -78,17 +78,15 @@ class Logic():
     def genTagSets(self, ui, dataset, patients, baseTags):
 
         for pat in Logic.finalPatients:
-            self.patientName = pat
-            self.checkedList = []
-            self.newValues   = []
+            self.patientName    = pat
+            self.checkedList    = []
+            self.tagPairs       = {}
             
-            rootPatient = [self.patientName, self.checkedList, self.newValues]
+            rootPatient = [self.patientName, self.checkedList, self.tagPairs]
             
             if rootPatient not in ui.tagSet:
                 ui.tagSet.append(rootPatient)
-                print ui.tagSet
                 
-
 if __name__ == "__main__":
     pass
         

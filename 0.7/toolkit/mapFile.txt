@@ -1,0 +1,12 @@
+B-PML000202
+["Patient's Name", 'Patient ID', "Patient's Sex", 'Type of Patient ID']
+{}
+Roger
+["Patient's Sex", 'Other Patient IDs', 'Issuer of Patient ID Qualifiers Sequence', 'Issuer of Patient ID']
+{}
+B-PML000202
+["Patient's Name", 'Patient ID', "Patient's Sex", 'Type of Patient ID']
+{}
+Roger
+["Patient's Sex", 'Other Patient IDs', 'Issuer of Patient ID Qualifiers Sequence', 'Issuer of Patient ID']
+{}

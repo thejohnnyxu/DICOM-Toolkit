@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import sys, os, dicom, sqlite3, wx, shutil, dtk_logic
+import sys, os, dicom, wx, dtk_logic, dtk_parser
  
 logic = dtk_logic.Logic()
+parser = dtk_parser.Parser()
 
 # ------------------------------
 class Process(wx.Panel):
@@ -11,7 +12,6 @@ class Process(wx.Panel):
     checkedTags     = []
     currentPatient  = ""
     focusedTag      = ""
-    tagChanges      = []
     tagSet          = []
     editPair        = {}
     
@@ -42,12 +42,13 @@ class Process(wx.Panel):
         
         # Buttons
         self.proBtn = wx.Button(self, 101, "Process",               size=(150,25))
-        self.preBtn = wx.Button(self, 102, "Previous Selection",    size=(150,25))
+        self.preBtn = wx.Button(self, 102, "Load Map",              size=(150,25))
         self.chgBtn = wx.Button(self, 103, "Change",                size=(150,25))
         self.addBtn = wx.Button(self, 104, "Add",                   size=(75,25))
         self.rmvBtn = wx.Button(self, 105, "Remove",                size=(75,25))
         self.batBtn = wx.Button(self, 106, "Batch Process",         size=(150,25))
         self.mapBtn = wx.Button(self, 107, "Map",                   size=(150,25))
+        self.genBtn = wx.Button(self, 108, "Generate Map",          size=(150,25))
         
         # Text Ctrl
         self.editTc = wx.TextCtrl(self, 111, '', size=(450,25))
@@ -102,24 +103,26 @@ class Process(wx.Panel):
         self.hboxB3.Add(self.addBtn)
         self.hboxB3.Add(self.rmvBtn)
         
-        self.vboxB2.AddSpacer((1,110))
+        self.vboxB2.AddSpacer((1,90))
+        self.vboxB2.Add(self.genBtn)
         self.vboxB2.Add(self.batBtn)
-        self.vboxB2.Add(self.proBtn, -1, wx.TOP, 5)
+        self.vboxB2.Add(self.proBtn)
         
         # Bindings
         self.Bind(wx.EVT_BUTTON, self.process,      id=101)
-        self.Bind(wx.EVT_BUTTON, self.loadPrev,     id=102)
+        self.Bind(wx.EVT_BUTTON, self.loadMap,     id=102)
         self.Bind(wx.EVT_BUTTON, self.change,       id=103)
         self.Bind(wx.EVT_BUTTON, self.add,          id=104)
         self.Bind(wx.EVT_BUTTON, self.remove,       id=105)
         self.Bind(wx.EVT_BUTTON, self.batch,        id=106)
         self.Bind(wx.EVT_BUTTON, self.mapper,       id=107)
+        self.Bind(wx.EVT_BUTTON, self.genMap,       id=108)
         self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=151)
         self.Bind(wx.EVT_LISTBOX, self.clicked,     id=151)
         self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=131)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
-        self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change, id=111)
+        #self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change, id=111)
         
         # Initial Settings
         self.SetSizer(self.container)
@@ -134,10 +137,10 @@ class Process(wx.Panel):
     
     # self.checklistbox
     def clicked(self, event):
-        
-        self.id     = event.GetSelection()
-        Process.focusedTag  = self.tagCLBox.GetString(self.tagCLBox.GetSelection())      
-        self.tag    = str(self.tagCLBox.GetString(self.id))
+
+        self.id = event.GetSelection()
+        Process.focusedTag = self.tagCLBox.GetString(self.tagCLBox.GetSelection())      
+        self.tag = str(self.tagCLBox.GetString(self.id))
         
         self.tagCLBox.Check(self.id)
         self.tagTc.SetValue(Process.focusedTag)
@@ -152,17 +155,6 @@ class Process(wx.Panel):
             self.editTc.SetValue(Process.editPair[Process.focusedTag])
         else:
             self.editTc.Clear()
-        
-        
-    # self.editTC & self.chgBtn
-    def change(self, event):
-        global baseTags
-        
-        self.value = self.editTc.GetValue()
-        Process.editPair[Process.focusedTag] = self.value
-
-        self.refreshChecklist()
-        self.editTc.Clear()
         
     # Helper function for change
     def refreshChecklist(self):
@@ -187,13 +179,44 @@ class Process(wx.Panel):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
 
-        for pair in Process.tagChanges:
+        for pair in Process.editPair.items():
             if Process.focusedTag == pair[0]:
                 self.editTc.SetValue(pair[1])
+        
+    # self.editTC & self.chgBtn
+    def change(self, event):
+        global baseTags
+        
+        Process.editPair[Process.focusedTag] = self.editTc.GetValue()
+        
+        for pat in Process.tagSet:
+            if pat[0] == Process.currentPatient:
+                pat[2] = list(Process.editPair.items())
+            
+        self.editTc.Clear()
+        self.refreshChecklist()
     
     # self.preBtn           
-    def loadPrev(self, event):
-        pass
+    def loadMap(self, event):
+        mapFile = open('mapfile.txt', 'r')
+        
+        self.lineCount      = 0
+        self.patientName    = ""
+        self.checkedList    = []
+        self.tagPairs       = {}
+        self.rootPatient    = [self.patientName, self.checkedList, self.tagPairs]
+
+        for i in range(2):
+            self.patientName = parser.parseCode(mapFile.readline().split("\n"))
+            print self.patientName
+            self.checkedList = parser.parseCode(mapFile.readline().split("\n"))
+            print self.checkedList
+            self.tagPairs    = parser.parseCode(mapFile.readline().split("\n"))
+            print self.tagPairs
+            self.rootPatient = [self.patientName, self.checkedList, self.tagPairs]
+            Process.tagSet.append(self.rootPatient)
+            
+        self.refreshChecklist()
     
     # self.tagdrop
     def onSelect(self, event):
@@ -230,11 +253,11 @@ class Process(wx.Panel):
         # Clears Process.cachedTags
         Process.cachedTags = []
         
-        # Sets Process.checkedTags and Process.tagChanges for the Process.currentPatient
+        # Sets Process.checkedTags and Process.editPair for the Process.currentPatient
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
                 Process.checkedTags = pat[1]
-                Process.tagChanges = pat[2]
+                Process.editPairs   = pat[2]
                 
         for idx1, val1, in enumerate(Process.checkedTags):
             for idx2, val2, in enumerate(Process.cachedTags):
@@ -244,9 +267,9 @@ class Process(wx.Panel):
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
                 pat[1] = Process.checkedTags
-                pat[2] = list(Process.editPair.items())
-                    
-        
+                pat[2] = Process.editPair
+                
+        Process.editPair.clear()
                 
         self.refreshChecklist()
                        
@@ -268,17 +291,18 @@ class Process(wx.Panel):
         
     def batch(self, event):
         global baseTags
+        
         for e in Process.tagSet:
             print e
             
-        print "Process.checkedTags : " + str(Process.checkedTags)
-        print "Process.tagChanges : " + str(Process.tagChanges)
+        print "========== checkedTags : " + str(Process.checkedTags)
+        print "========== editPair    : " + str(Process.editPair)
         
     def mapper(self, event):
         global tPath, baseTags
         
-        Process.tagChanges  = []
         Process.checkedTags = []
+        Process.editPair    = {}
         
         # Uncheck everything
         for idx1, val1, in enumerate(Process.cachedTags):
@@ -291,6 +315,15 @@ class Process(wx.Panel):
                 if self.byte == 'DICM':
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.mapper(self, ds, tPath, baseTags)
+                    
+    def genMap(self, event):
+        
+        mapFile = open('mapFile.txt', 'wb')
+        
+        for pat in Process.tagSet:
+            for p in pat:
+                mapFile.write(str(p))
+                mapFile.write("\n")
 
 # ------------------------------
 class Batch(wx.Panel):
