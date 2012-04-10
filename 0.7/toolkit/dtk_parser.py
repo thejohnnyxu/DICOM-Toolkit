@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import dtk_logic
 class Parser():
     def parseDict(self, dict_string):
         d = {}
@@ -17,7 +16,9 @@ class Parser():
             key = self.parseCode(parts[0])
             value = self.parseCode(parts[1])
             d[key] = value
-
+        
+        print d
+        
         return d
 
     def parseList(self, list_string):
@@ -51,7 +52,12 @@ class Parser():
 
     def parseCode(self, text):
         '''Parse a string into a dictionary, number, or string'''
+        print "AAAAAA:" + text
         text = self.deleteOutsideSpaces(text)
+        text = text.strip("\n")
+        text = text.strip("\\")
+        text = self.removeUnicode(text)
+        print "BBBBBB:" + text
 
         #if the top level is a dictionary (first and last character are { and }
         if text[0] == "{" and text[len(text) - 1] == "}":
@@ -72,6 +78,11 @@ class Parser():
     def removeFirstLast(self, text):
         '''Removes the first and last characters in the string'''
         text = text[1:-1]
+        return text
+        
+    def removeUnicode(self, text):
+        if text[0] == "u":
+            text = text[1:]
         return text
 
     def deleteOutsideSpaces(self, text):

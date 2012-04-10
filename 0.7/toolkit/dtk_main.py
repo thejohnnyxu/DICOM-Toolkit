@@ -14,6 +14,7 @@ class Process(wx.Panel):
     focusedTag      = ""
     tagSet          = []
     editPair        = {}
+    removePrivate   = True
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
@@ -122,7 +123,6 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=131)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
-        #self.editTc.Bind(wx.EVT_KILL_FOCUS, self.change, id=111)
         
         # Initial Settings
         self.SetSizer(self.container)
@@ -140,7 +140,7 @@ class Process(wx.Panel):
 
         self.id = event.GetSelection()
         Process.focusedTag = self.tagCLBox.GetString(self.tagCLBox.GetSelection())      
-        self.tag = str(self.tagCLBox.GetString(self.id))
+        self.tag = self.tagCLBox.GetString(self.id)
         
         self.tagCLBox.Check(self.id)
         self.tagTc.SetValue(Process.focusedTag)
@@ -165,7 +165,7 @@ class Process(wx.Panel):
         
         self.tagCLBox.Clear()
         
-        # Populates _cacheTags
+        # Populates cachedTags
         for pair in baseTags:
             self.word = str(pair[0])
             if self.word[1:5] == self.curSelc:
@@ -191,7 +191,7 @@ class Process(wx.Panel):
         
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
-                pat[2] = list(Process.editPair.items())
+                pat[2] = Process.editPair
             
         self.editTc.Clear()
         self.refreshChecklist()
@@ -200,23 +200,35 @@ class Process(wx.Panel):
     def loadMap(self, event):
         mapFile = open('mapfile.txt', 'r')
         
-        self.lineCount      = 0
+        self.tmpFile        = []
         self.patientName    = ""
         self.checkedList    = []
         self.tagPairs       = {}
         self.rootPatient    = [self.patientName, self.checkedList, self.tagPairs]
+        
+        self.mapFile = mapFile.readlines()
 
-        for i in range(2):
-            self.patientName = parser.parseCode(mapFile.readline().split("\n"))
-            print self.patientName
-            self.checkedList = parser.parseCode(mapFile.readline().split("\n"))
-            print self.checkedList
-            self.tagPairs    = parser.parseCode(mapFile.readline().split("\n"))
-            print self.tagPairs
+        self.mapFile = self.chunks(self.mapFile, 3)
+        
+        for pat in self.mapFile:
+            self.patientName    = parser.parseCode(pat[0])
+            self.checkedList    = parser.parseCode(pat[1])
+            self.tagPairs       = parser.parseCode(pat[2])
+            
+            for tag in self.tagPairs.keys():
+                if tag not in self.checkedList:
+                    self.checkedList.append(tag)
+            
             self.rootPatient = [self.patientName, self.checkedList, self.tagPairs]
             Process.tagSet.append(self.rootPatient)
             
+        for pat in Process.tagSet:
+            self.patientDrop.Append(pat[0])
+   
         self.refreshChecklist()
+        
+    def chunks(self, givenList, groupSize):
+        return [givenList[i:i+groupSize] for i in range(0, len(givenList), groupSize)]
     
     # self.tagdrop
     def onSelect(self, event):
@@ -241,6 +253,8 @@ class Process(wx.Panel):
             for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
+                    
+        self.refreshChecklist()
                         
     def setPatient(self, event):
 
@@ -257,7 +271,7 @@ class Process(wx.Panel):
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
                 Process.checkedTags = pat[1]
-                Process.editPairs   = pat[2]
+                Process.editPair    = pat[2]
                 
         for idx1, val1, in enumerate(Process.checkedTags):
             for idx2, val2, in enumerate(Process.cachedTags):
@@ -269,18 +283,25 @@ class Process(wx.Panel):
                 pat[1] = Process.checkedTags
                 pat[2] = Process.editPair
                 
-        Process.editPair.clear()
-                
         self.refreshChecklist()
                        
     # self.prvchk
     def privTags(self, event):
-        pass
+        if self.prvchk.GetValue():
+            Process.removePrivate = True
+        else:
+            Process.removePrivate = False
     
     # self.checklist
     def flag(self, event):
-        pass
-            
+        self.id     = event.GetSelection()
+        self.tag    = self.tagCLBox.GetString(self.id)
+        
+        if self.tagCLBox.IsChecked(self.id):
+            Process.checkedTags.append(self.tag)
+        else:
+            Process.checkedTags.remove(self.tag)
+        
     # self.addBtn
     def add(self, event):
        pass
@@ -294,9 +315,9 @@ class Process(wx.Panel):
         
         for e in Process.tagSet:
             print e
-            
-        print "========== checkedTags : " + str(Process.checkedTags)
-        print "========== editPair    : " + str(Process.editPair)
+        
+        print Process.checkedTags
+        print Process.editPair
         
     def mapper(self, event):
         global tPath, baseTags

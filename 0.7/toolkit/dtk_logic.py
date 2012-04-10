@@ -6,11 +6,7 @@ class Logic():
     finalPatients = []
     def __init__(self):
         pass
-    
-    # Support Functions for dtk_main
-    def processTags(self, dataset, _removePrivate):
-        pass
-        
+
     # ------------------------------
     def mapper(self, parent, dataset, tPath, baseTags):
         # PatientsName/StudyDescription + StudyDate/SeriesDescription + SeriesDate + SeriesTime/

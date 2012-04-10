@@ -1,12 +1,6 @@
 B-PML000202
-["Patient's Name", 'Patient ID', "Patient's Sex", 'Type of Patient ID']
-{}
+[u"Patient's Name", u'Patient ID', u"Patient's Address", u'Clinical Trial Sponsor Name', 'Issuer of Patient ID']
+{u"Patient's Name": u'Bob', u'Patient ID': u'7264', u'Clinical Trial Sponsor Name': u'Roland'}
 Roger
-["Patient's Sex", 'Other Patient IDs', 'Issuer of Patient ID Qualifiers Sequence', 'Issuer of Patient ID']
-{}
-B-PML000202
-["Patient's Name", 'Patient ID', "Patient's Sex", 'Type of Patient ID']
-{}
-Roger
-["Patient's Sex", 'Other Patient IDs', 'Issuer of Patient ID Qualifiers Sequence', 'Issuer of Patient ID']
-{}
+[u"Patient's Name", u'Patient ID', u"Patient's Address", u"Patient's Weight", u"Patient's Size Code Sequence", u'Image Type']
+{u"Patient's Name": u'Roger Moore', u'Patient ID': u'32323'}
