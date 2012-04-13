@@ -17,8 +17,6 @@ class Parser():
             value = self.parseCode(parts[1])
             d[key] = value
         
-        print d
-        
         return d
 
     def parseList(self, list_string):
@@ -52,12 +50,10 @@ class Parser():
 
     def parseCode(self, text):
         '''Parse a string into a dictionary, number, or string'''
-        print "AAAAAA:" + text
         text = self.deleteOutsideSpaces(text)
         text = text.strip("\n")
         text = text.strip("\\")
         text = self.removeUnicode(text)
-        print "BBBBBB:" + text
 
         #if the top level is a dictionary (first and last character are { and }
         if text[0] == "{" and text[len(text) - 1] == "}":

@@ -1,6 +1,8 @@
 B-PML000202
-[u"Patient's Name", u'Patient ID', u"Patient's Address", u'Clinical Trial Sponsor Name', 'Issuer of Patient ID']
-{u"Patient's Name": u'Bob', u'Patient ID': u'7264', u'Clinical Trial Sponsor Name': u'Roland'}
+[u"Patient's Name", u'Patient ID', u"Patient's Insurance Plan Code Sequence", u"Patient's Primary Language Code Sequence", u"Patient's Primary Language Modifier Code Sequence", u"Patient's Age", u"Patient's Size", u"Patient's Weight", u"Patient's Size Code Sequence", u"Patient's Address"]
+{u"Patient's Name": u'Roberto', u'Patient ID': u'1337'}
+[u"Doesn't have any legs", u"Can't eat peanuts"]
 Roger
-[u"Patient's Name", u'Patient ID', u"Patient's Address", u"Patient's Weight", u"Patient's Size Code Sequence", u'Image Type']
-{u"Patient's Name": u'Roger Moore', u'Patient ID': u'32323'}
+[u"Patient's Name", u'Patient ID', u"Patient's Birth Date", u"Patient's Birth Time", u"Patient's Sex", u"Patient's Insurance Plan Code Sequence", u"Patient's Primary Language Code Sequence", u'Other Patient IDs', u"Patient's Primary Language Modifier Code Sequence", u"Patient's Age", u"Patient's Size", u"Patient's Size Code Sequence", u"Patient's Weight", u"Patient's Address"]
+{u"Patient's Name": u'Miguel', u'Patient ID': u'9999', u"Patient's Address": u'14 Campsite Lane'}
+[u'Born in Spain']

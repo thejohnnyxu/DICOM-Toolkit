@@ -12,6 +12,7 @@ class Process(wx.Panel):
     checkedTags     = []
     currentPatient  = ""
     focusedTag      = ""
+    insertTags      = []
     tagSet          = []
     editPair        = {}
     removePrivate   = True
@@ -133,7 +134,15 @@ class Process(wx.Panel):
     # Handlers
     # self.proBtn
     def process(self, event):
-        pass
+        global sListing, root, filename, tPath, dirname, dirs
+    
+        for dirname, dirs, files, in sListing:
+            for filename in files:
+                rFile = open(dirname + '/' + filename, 'rb')
+                self.byte = repr(rFile.read())[513:517]
+                if self.byte == 'DICM':
+                    ds = dicom.read_file(dirname +'/'+ filename)
+                    logic.processTags(self, ds, dirname, tPath, filename)
     
     # self.checklistbox
     def clicked(self, event):
@@ -208,18 +217,19 @@ class Process(wx.Panel):
         
         self.mapFile = mapFile.readlines()
 
-        self.mapFile = self.chunks(self.mapFile, 3)
+        self.mapFile = self.chunks(self.mapFile, 4)
         
         for pat in self.mapFile:
             self.patientName    = parser.parseCode(pat[0])
             self.checkedList    = parser.parseCode(pat[1])
             self.tagPairs       = parser.parseCode(pat[2])
+            self.insertTags     = parser.parseCode(pat[3])
             
             for tag in self.tagPairs.keys():
                 if tag not in self.checkedList:
                     self.checkedList.append(tag)
             
-            self.rootPatient = [self.patientName, self.checkedList, self.tagPairs]
+            self.rootPatient = [self.patientName, self.checkedList, self.tagPairs, self.insertTags]
             Process.tagSet.append(self.rootPatient)
             
         for pat in Process.tagSet:
@@ -267,21 +277,30 @@ class Process(wx.Panel):
         # Clears Process.cachedTags
         Process.cachedTags = []
         
+        self.tagLBox.Clear()
+        
         # Sets Process.checkedTags and Process.editPair for the Process.currentPatient
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
                 Process.checkedTags = pat[1]
                 Process.editPair    = pat[2]
+                Process.insertTags  = pat[3]
                 
         for idx1, val1, in enumerate(Process.checkedTags):
             for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
+                    
+        for pat in Process.tagSet:
+            if pat[0] == Process.currentPatient:
+                for entry in pat[3]:
+                    self.tagLBox.Append(entry)
         
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
                 pat[1] = Process.checkedTags
                 pat[2] = Process.editPair
+                pat[3] = Process.insertTags
                 
         self.refreshChecklist()
                        
@@ -304,21 +323,34 @@ class Process(wx.Panel):
         
     # self.addBtn
     def add(self, event):
-       pass
+       tcVal = self.addTc.GetValue()
+        
+       Process.insertTags.append(tcVal)
+    
+       self.tagLBox.Insert(tcVal, pos=0)
+        
+       self.addTc.Clear()
        
     # self.rmvBtn
     def remove(self, event):
-        pass
+        curSelc     = self.tagLBox.GetSelection()
+        self.val    = self.tagLBox.GetString(curSelc)
+        
+        self.tagLBox.Delete(curSelc)
+
+        Process.insertTags.remove(self.val)
         
     def batch(self, event):
-        global baseTags
+        global sListing, root, filename, tPath, dirname, dirs
         
-        for e in Process.tagSet:
-            print e
-        
-        print Process.checkedTags
-        print Process.editPair
-        
+        for dirname, dirs, files, in sListing:
+            for filename in files:
+                rFile = open(dirname + '/' + filename, 'rb')
+                self.byte = repr(rFile.read())[513:517]
+                if self.byte == 'DICM':
+                    ds = dicom.read_file(dirname +'/'+ filename)
+                    logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
+                    
     def mapper(self, event):
         global tPath, baseTags
         
