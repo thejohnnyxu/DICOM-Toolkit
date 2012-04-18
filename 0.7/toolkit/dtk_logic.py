@@ -86,13 +86,10 @@ class Logic():
             for tag in ui.checkedTags:
                 if tag == data_element.name:
                     data_element.value = ''
-    
-        # Sets a selected Tag to the input value
-        for data_element in dataset:
             for tag in ui.editPair.items():
                 if tag[0] == data_element.name:
                     data_element.value = tag[1]
-                    
+    
         # Adds private Tags
         for value in ui.insertTags:
             tagLoc += 1
@@ -131,6 +128,7 @@ class Logic():
         for data_element in dataset:
             for pat in tagSet:
                 if pat[0] == self.currentDS:
+                    _name = pat[0]
                     for tag in pat[2].items():
                         if tag[0] == "Patient's Name":
                             _name = tag[1]

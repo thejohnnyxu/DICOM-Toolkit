@@ -54,13 +54,20 @@ class Parser():
         text = text.strip("\n")
         text = text.strip("\\")
         text = self.removeUnicode(text)
-
+        
+        d = {}
+        e = []
+        
         #if the top level is a dictionary (first and last character are { and }
-        if text[0] == "{" and text[len(text) - 1] == "}":
+        if text[0] == "{" and text[len(text) - 1] == "}" and len(text) > 2:
             return self.parseDict(text)
+        elif text[0] == "{" and text[len(text) - 1] == "}" and len(text) == 2:
+            return d
         #parse a list
-        elif text[0] == "[" and text[len(text) - 1] == "]":
+        elif text[0] == "[" and text[len(text) - 1] == "]" and len(text) > 2:
             return self.parseList(text)
+        elif text[0] == "[" and text[len(text) - 1] == "]" and len(text) == 2:
+            return e
         #if it is a special string character in python language,
         #simply return the text without the " character or the ' character
         #at the beginning and end
@@ -71,23 +78,20 @@ class Parser():
         else:
             return self.parseStringOrNumber(text)
 
+    def removeUnicode(self, text):
+        if text[0] == "u":
+            text = text[1:]
+        return text
+
     def removeFirstLast(self, text):
         '''Removes the first and last characters in the string'''
-        if text:
-            text = text[1:-1]
-            return text
-        
-    def removeUnicode(self, text):
-        if text:
-            if text[0] == "u":
-                text = text[1:]
-            return text
+        text = text[1:-1]
+        return text
 
     def deleteOutsideSpaces(self, text):
         '''Deletes the leading and trailing spaces in text'''
-        if text:
-            while text[0] == " ":
-                text = text[1:]
+        while text[0] == " ":
+            text = text[1:]
         
         length = len(text)
         while length > 0 and text[length - 1] == " ":

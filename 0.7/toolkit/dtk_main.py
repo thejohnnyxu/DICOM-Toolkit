@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, dicom, wx, dtk_logic, dtk_parser
+import sys, os, dicom, wx, dtk_logic, dtk_parser, webbrowser
 
 logic = dtk_logic.Logic()
 parser = dtk_parser.Parser()
@@ -36,6 +36,8 @@ class Process(wx.Panel):
         self.vboxA1 = wx.BoxSizer(wx.VERTICAL)
         self.vboxA2 = wx.BoxSizer(wx.VERTICAL)
         self.hboxA3 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxA4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxA5 = wx.BoxSizer(wx.HORIZONTAL)
         
         self.hboxB  = wx.BoxSizer(wx.HORIZONTAL)
         self.vboxB1 = wx.BoxSizer(wx.VERTICAL)
@@ -45,21 +47,23 @@ class Process(wx.Panel):
         # Buttons
         self.proBtn = wx.Button(self, 101, "Process",               size=(150,25))
         self.lodBtn = wx.Button(self, 102, "Load Map",              size=(150,25))
-        self.chgBtn = wx.Button(self, 103, "Change",                size=(150,25))
+        self.chgBtn = wx.Button(self, 103, "Edit Tag",              size=(150,25))
         self.addBtn = wx.Button(self, 104, "Add",                   size=(75,25))
         self.rmvBtn = wx.Button(self, 105, "Remove",                size=(75,25))
         self.batBtn = wx.Button(self, 106, "Batch Process",         size=(150,25))
         self.mapBtn = wx.Button(self, 107, "Map",                   size=(150,25))
         self.genBtn = wx.Button(self, 108, "Create Map",            size=(150,25))
+        self.lnkBtn = wx.Button(self, 109, "DICOM Tags",           size=(150,25))
+        self.cnlBtn = wx.Button(self, 110, "Remove Edit",           size=(380,25))
         
         # Text Ctrl
-        self.editTc = wx.TextCtrl(self, 111, '', size=(450,25))
-        self.addTc  = wx.TextCtrl(self, 112, '', size=(450,25))
-        self.tagTc  = wx.TextCtrl(self, 113, 'Select a Tag', size=(450,25), style=wx.TE_READONLY)
+        self.editTc = wx.TextCtrl(self, 111, 'Input field for new Tag value', size=(625,25))
+        self.addTc  = wx.TextCtrl(self, 112, 'Input field for adding Comments', size=(450,25))
+        self.tagTc  = wx.TextCtrl(self, 113, 'Select a Tag to edit it', size=(780,25), style=wx.TE_READONLY)
         
         # Combo
-        self.tagsDrop = wx.ComboBox(self, 121, size=(600, 25), choices=self.tagGroups, style=wx.CB_READONLY)
-        self.patientDrop = wx.ComboBox(self, 122, size=(600, 25), choices=[], style=wx.CB_READONLY)
+        self.tagsDrop = wx.ComboBox(self, 121, size=(780, 25), choices=self.tagGroups, style=wx.CB_READONLY)
+        self.patientDrop = wx.ComboBox(self, 122, size=(780, 25), choices=['Patients List'], style=wx.CB_READONLY)
         
         # Checkbox
         self.privateCheck = wx.CheckBox(self, 131, "Remove Private Tags")
@@ -67,14 +71,12 @@ class Process(wx.Panel):
         # Lines
         self.line1 = wx.StaticLine(self, -1, size=(800,1))
         
-        # Dialog
-        self.proDlg = wx.MessageDialog(self, 'This may take a few minutes to finish.', 'Processing DICOM Files...', wx.OK|wx.ICON_INFORMATION)
-        
         # List Box
         self.tagLBox = wx.ListBox(self, 141, size=(600,135), style=wx.TE_MULTILINE)
+        self.changedLBox = wx.ListBox(self, 142, size=(380,230), style=wx.TE_MULTILINE)
         
         # Check List Box
-        self.tagCLBox = wx.CheckListBox(self, 151, size=(600,255), choices=Process.cachedTags, style=0)
+        self.tagCLBox = wx.CheckListBox(self, 151, size=(400,255), choices=Process.cachedTags, style=0)
  
         # Layout
         self.container.Add(self.hboxA)
@@ -84,24 +86,30 @@ class Process(wx.Panel):
         self.container.Add(self.hboxB)
 
         self.hboxA.Add(self.vboxA1, -1, wx.LEFT, 5)
-        self.hboxA.Add(self.vboxA2, -1, wx.LEFT, 25)
         
         self.hboxB.Add(self.vboxB1, -1, wx.LEFT, 5)
         self.hboxB.Add(self.vboxB2, -1, wx.LEFT, 25)
         
         self.vboxA1.Add(self.privateCheck)
         self.vboxA1.AddSpacer((1,2))
-        self.vboxA1.Add(self.patientDrop)
+        self.vboxA1.Add(self.hboxA4)
         self.vboxA1.Add(self.tagsDrop)
         self.vboxA1.AddSpacer((1,2))
-        self.vboxA1.Add(self.tagCLBox)
+        self.vboxA1.Add(self.hboxA5)
         self.vboxA1.AddSpacer((1,2))
         self.vboxA1.Add(self.tagTc)
+        self.vboxA1.AddSpacer((1,5))
         self.vboxA1.Add(self.hboxA3)
         self.hboxA3.Add(self.editTc)
+        self.hboxA3.AddSpacer((5,1))
         self.hboxA3.Add(self.chgBtn)
         
-        self.vboxA2.Add(self.mapBtn, -1, wx.TOP, 18)        
+        self.hboxA5.Add(self.tagCLBox)
+        self.hboxA5.Add(self.vboxA2)
+        self.vboxA2.Add(self.changedLBox)
+        self.vboxA2.Add(self.cnlBtn)
+        
+        self.hboxA4.Add(self.patientDrop)
                 
         self.vboxB1.Add(self.tagLBox)
         self.vboxB1.Add(self.hboxB3)
@@ -109,7 +117,9 @@ class Process(wx.Panel):
         self.hboxB3.Add(self.addBtn)
         self.hboxB3.Add(self.rmvBtn)
         
-        self.vboxB2.AddSpacer((1,60))
+        self.vboxB2.AddSpacer((1,10))
+        self.vboxB2.Add(self.mapBtn)
+        self.vboxB2.Add(self.lnkBtn)
         self.vboxB2.Add(self.lodBtn)
         self.vboxB2.Add(self.genBtn)
         self.vboxB2.Add(self.batBtn)
@@ -117,24 +127,29 @@ class Process(wx.Panel):
         
         # Bindings
         self.Bind(wx.EVT_BUTTON, self.process,      id=101)
-        self.Bind(wx.EVT_BUTTON, self.loadMap,     id=102)
+        self.Bind(wx.EVT_BUTTON, self.loadMap,      id=102)
         self.Bind(wx.EVT_BUTTON, self.change,       id=103)
         self.Bind(wx.EVT_BUTTON, self.add,          id=104)
         self.Bind(wx.EVT_BUTTON, self.remove,       id=105)
         self.Bind(wx.EVT_BUTTON, self.batch,        id=106)
         self.Bind(wx.EVT_BUTTON, self.mapper,       id=107)
         self.Bind(wx.EVT_BUTTON, self.genMap,       id=108)
+        self.Bind(wx.EVT_BUTTON, self.launchLink,   id=109)
+        self.Bind(wx.EVT_BUTTON, self.removeEdit,   id=110)
         self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=151)
         self.Bind(wx.EVT_LISTBOX, self.clicked,     id=151)
+        self.Bind(wx.EVT_LISTBOX, self.displayValue,id=142)
         self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=131)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
+        self.addTc.Bind(wx.EVT_SET_FOCUS,   self.clearField)
         
         # Initial Settings
         self.SetSizer(self.container)
         self.privateCheck.SetValue(True)
         self.removePrivate = True
         self.tagsDrop.SetValue('0010 : Patient Information')
+        self.patientDrop.SetValue('Patients List')
 
     # Handlers
     # self.proBtn
@@ -169,6 +184,21 @@ class Process(wx.Panel):
             self.editTc.SetValue(Process.editPair[Process.focusedTag])
         else:
             self.editTc.Clear()
+            
+    def displayValue(self, event):
+        self.id = event.GetSelection()
+        Process.focusedTag = self.changedLBox.GetString(self.changedLBox.GetSelection())      
+        self.tag = self.changedLBox.GetString(self.id)
+        
+        self.tagTc.SetValue(Process.focusedTag)
+            
+        if Process.editPair.has_key(Process.focusedTag):
+            self.editTc.SetValue(Process.editPair[Process.focusedTag])
+        else:
+            self.editTc.Clear()
+            
+    def launchLink(self, event):
+        webbrowser.open('http://www.dicomtags.com/dicom-standard/09_06pu3.php')
         
     # Helper function for change
     def refreshChecklist(self):
@@ -177,6 +207,7 @@ class Process(wx.Panel):
         self.checked        = self.tagCLBox.GetChecked()
         Process.cachedTags  = []        
         
+        self.changedLBox.Clear()
         self.tagCLBox.Clear()
         
         # Populates cachedTags
@@ -186,6 +217,7 @@ class Process(wx.Panel):
                 Process.cachedTags.append(pair[1])
         
         self.tagCLBox.InsertItems(items=Process.cachedTags, pos=0)
+        self.changedLBox.InsertItems(items=Process.editPair.keys(), pos=0)
         
         # Checks all tags from _Process.checkedTags in _cacheTags
         for idx1, val1, in enumerate(Process.checkedTags):
@@ -196,6 +228,8 @@ class Process(wx.Panel):
         for pair in Process.editPair.items():
             if Process.focusedTag == pair[0]:
                 self.editTc.SetValue(pair[1])
+        
+        
         
     # self.editTC & self.chgBtn
     def change(self, event):
@@ -214,11 +248,14 @@ class Process(wx.Panel):
     def loadMap(self, event):
         mapFile = open('mapfile.txt', 'r')
         
+        self.patientDrop.Clear()
+        
+        Process.tagSet      = []
         self.tmpFile        = []
         self.patientName    = ""
         self.checkedList    = []
         self.tagPairs       = {}
-        self.rootPatient    = [self.patientName, self.checkedList, self.tagPairs]
+        self.rootPatient    = []
         
         self.mapFile = mapFile.readlines()
 
@@ -235,16 +272,18 @@ class Process(wx.Panel):
                     self.checkedList.append(tag)
             
             self.rootPatient = [self.patientName, self.checkedList, self.tagPairs, self.insertTags]
-            Process.tagSet.append(self.rootPatient)
             
+            Process.tagSet.append(self.rootPatient)
+
         for pat in Process.tagSet:
             self.patientDrop.Append(pat[0])
    
         self.refreshChecklist()
+        mapFile.close()
         
     def chunks(self, givenList, groupSize):
         return [givenList[i:i+groupSize] for i in range(0, len(givenList), groupSize)]
-    
+
     # self.tagdrop
     def onSelect(self, event):
         
@@ -311,7 +350,7 @@ class Process(wx.Panel):
                        
     # self.prvchk
     def privTags(self, event):
-        if self.prvchk.GetValue():
+        if self.privateCheck.GetValue():
             Process.removePrivate = True
         else:
             Process.removePrivate = False
@@ -345,6 +384,25 @@ class Process(wx.Panel):
 
         Process.insertTags.remove(self.val)
         
+    def removeEdit(self, event):
+        curSelc = self.changedLBox.GetSelection()
+        self.val = self.changedLBox.GetString(curSelc)
+        
+        self.changedLBox.Delete(curSelc)
+        
+        for pat in Process.tagSet:
+            for key in Process.editPair.keys():
+                if key == self.val:
+                    del Process.editPair[key]
+                    for tag in pat[1]:
+                        if key == tag:
+                            pat[1].remove(tag)
+                    
+        print Process.tagSet
+        
+        self.refreshChecklist()
+                    
+        
     def batch(self, event):
         global sListing, root, filename, tPath, dirname, dirs
         
@@ -355,6 +413,8 @@ class Process(wx.Panel):
                 if self.byte == 'DICM':
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
+                    
+        self.genMap(self)
                     
     def mapper(self, event):
         global tPath, baseTags
@@ -373,15 +433,23 @@ class Process(wx.Panel):
                 if self.byte == 'DICM':
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.mapper(self, ds, tPath, baseTags)
+                rFile.close()
                     
     def genMap(self, event):
         
         mapFile = open('mapFile.txt', 'wb')
         
         for pat in Process.tagSet:
-            for p in pat:
-                mapFile.write(str(p))
-                mapFile.write("\n")
+            for line in pat:
+                line = str(line)
+                line = line.replace("u'", "'")
+                line = line.replace('u"', '"')
+                mapFile.write(line + "\n")
+                
+        mapFile.close()
+                
+    def clearField(self, event):
+        self.addTc.Clear()
 
 # ------------------------------
 class Batch(wx.Panel):
@@ -391,7 +459,7 @@ class Batch(wx.Panel):
 # ------------------------------
 class MainFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,700))
+        wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))
         
         global tPath, sPath, tListing, sListing, srcTc, tarTc
         
@@ -425,7 +493,8 @@ class MainFrame(wx.Frame):
         self.srcBtn     = wx.Button(self.panel, 101, 'Select Source', size=(150,25))
         self.tarBtn     = wx.Button(self.panel, 102, 'Select Target', size=(150,25))
         self.p1Btn      = wx.Button(self.panel, 103, 'Process', size=(300,25))
-        self.p2Btn      = wx.Button(self.panel, 104, 'Batch', size=(300,25))
+        self.p2Btn      = wx.Button(self.panel, 104, 'Export', size=(300,25))
+        self.hlpBtn     = wx.Button(self.panel, 105, "Help", size=(150,25))
         
         # Text Ctrl
         srcTc = wx.TextCtrl(self.panel, 131, '', size=(600,25))
@@ -460,6 +529,8 @@ class MainFrame(wx.Frame):
         
         self.hboxB.Add(self.p1Btn)
         self.hboxB.Add(self.p2Btn, -1, wx.LEFT, 5)
+        self.hboxB.AddSpacer((25,1))
+        self.hboxB.Add(self.hlpBtn)
 
         self.vboxC.Add(self.panel_one)
         self.vboxC.AddSpacer((1,50))
@@ -470,6 +541,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.setDest,      id=102)
         self.Bind(wx.EVT_BUTTON, self.showP1,       id=103)
         self.Bind(wx.EVT_BUTTON, self.showP2,       id=104)
+        self.Bind(wx.EVT_BUTTON, self.help,         id=105)
         self.Bind(wx.EVT_TEXT, self.refreshSource,  id=131)
         self.Bind(wx.EVT_TEXT, self.refreshTarget,  id=132)
         
@@ -525,6 +597,32 @@ class MainFrame(wx.Frame):
         self.panel_two.SetPosition((0,127))
         self.panel_one.Hide()
         self.panel_two.Show()
+        
+    # self.hlpBtn
+    def help(self, event):
+        self.helpText = """
+Single Target Mode:
+    Select a source directory containing only one Patient.\n
+Batch Mode:
+    Select a directory containing multiple Patients, press the (Map) button. Then choose which Patient to edit from the Patients List.\n
+Creating a Map File:
+    Press the (Create Map) button and a file called mapFile.txt will be created in the directory the toolkit is currently running from.\n
+Editing the Map File:
+    Each patient is composed of a 4 Line block in the Map file, each line with a specific format. For a complete list of Tags click the (DICOM Tags) button.
+    Note: All DICOM Tags uses the Name of the Tag rather than Keyword.\n
+    Line 1 : Name of the Patient
+    Line 2 : List of Tags that are to be sanitized.
+        Format: ["Tag1", "Tag2"] - Each Tag name has to be within quotes, seperated by commas.
+    Line 3 : Pairs of Tags and their new values.
+        Format: {"Tag1" : "Value1", "Tag2" : "Value2"} - Each Tag is paired with a new value by using a ":", each pair is seperated by commas.
+    Line 4 : List of Comments to be added.
+        Format: ["Comment1", "Comment2"] - Comments are written inside quotes, seperated by commas.\n
+Loading the Map File:
+    Press the (Load Map) button and all the settings from the Map file will be loaded into the toolkit. It is possible to make further changes with the toolkit or Batch Process with the settings of the Map file.
+"""
+        wx.MessageBox(self.helpText, "User's Guide", wx.OK | wx.ICON_INFORMATION)
+    
+    
 
 # ------------------------------
 def _genTags():

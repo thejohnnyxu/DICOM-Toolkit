@@ -1,8 +1,8 @@
 B-PML000202
-['Patient ID', "Patient's Sex", u"Patient's Name"]
-{'Patient ID': '123', u"Patient's Name": u'Mahone'}
-['no aids']
+[]
+{}
+[]
 Roger
-['Patient ID', "Patient's Sex", "Patient's Birth Date", "Patient's Age", u"Patient's Name"]
-{'Patient ID': '9393', u"Patient's Name": u'Burrows'}
-['asdds']
+[]
+{}
+[]
