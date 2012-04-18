@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sys, os, dicom, wx, dtk_logic, dtk_parser
- 
+
 logic = dtk_logic.Logic()
 parser = dtk_parser.Parser()
 
@@ -44,13 +44,13 @@ class Process(wx.Panel):
         
         # Buttons
         self.proBtn = wx.Button(self, 101, "Process",               size=(150,25))
-        self.preBtn = wx.Button(self, 102, "Load Map",              size=(150,25))
+        self.lodBtn = wx.Button(self, 102, "Load Map",              size=(150,25))
         self.chgBtn = wx.Button(self, 103, "Change",                size=(150,25))
         self.addBtn = wx.Button(self, 104, "Add",                   size=(75,25))
         self.rmvBtn = wx.Button(self, 105, "Remove",                size=(75,25))
         self.batBtn = wx.Button(self, 106, "Batch Process",         size=(150,25))
         self.mapBtn = wx.Button(self, 107, "Map",                   size=(150,25))
-        self.genBtn = wx.Button(self, 108, "Generate Map",          size=(150,25))
+        self.genBtn = wx.Button(self, 108, "Create Map",            size=(150,25))
         
         # Text Ctrl
         self.editTc = wx.TextCtrl(self, 111, '', size=(450,25))
@@ -64,17 +64,22 @@ class Process(wx.Panel):
         # Checkbox
         self.privateCheck = wx.CheckBox(self, 131, "Remove Private Tags")
         
+        # Lines
+        self.line1 = wx.StaticLine(self, -1, size=(800,1))
+        
         # Dialog
         self.proDlg = wx.MessageDialog(self, 'This may take a few minutes to finish.', 'Processing DICOM Files...', wx.OK|wx.ICON_INFORMATION)
         
         # List Box
-        self.tagLBox = wx.ListBox(self, 141, size=(600,140), style=wx.TE_MULTILINE)
+        self.tagLBox = wx.ListBox(self, 141, size=(600,135), style=wx.TE_MULTILINE)
         
         # Check List Box
         self.tagCLBox = wx.CheckListBox(self, 151, size=(600,255), choices=Process.cachedTags, style=0)
  
         # Layout
         self.container.Add(self.hboxA)
+        self.container.AddSpacer((1,5))
+        self.container.Add(self.line1)
         self.container.AddSpacer((1,5))
         self.container.Add(self.hboxB)
 
@@ -97,7 +102,6 @@ class Process(wx.Panel):
         self.hboxA3.Add(self.chgBtn)
         
         self.vboxA2.Add(self.mapBtn, -1, wx.TOP, 18)        
-        self.vboxA2.Add(self.preBtn)
                 
         self.vboxB1.Add(self.tagLBox)
         self.vboxB1.Add(self.hboxB3)
@@ -105,7 +109,8 @@ class Process(wx.Panel):
         self.hboxB3.Add(self.addBtn)
         self.hboxB3.Add(self.rmvBtn)
         
-        self.vboxB2.AddSpacer((1,90))
+        self.vboxB2.AddSpacer((1,60))
+        self.vboxB2.Add(self.lodBtn)
         self.vboxB2.Add(self.genBtn)
         self.vboxB2.Add(self.batBtn)
         self.vboxB2.Add(self.proBtn)
@@ -429,6 +434,7 @@ class MainFrame(wx.Frame):
         # Line
         self.line1 = wx.StaticLine(self.panel, -1, size=(800,1))
         self.line2 = wx.StaticLine(self.panel, -1, size=(800,1))
+        self.line3 = wx.StaticLine(self.panel, -1, size=(1,600))
         
         # Layout
         self.container.Add(self.hboxA)

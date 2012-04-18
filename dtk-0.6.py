@@ -672,7 +672,6 @@ def mapper(dataset):
                 if not os.path.exists(dir2):
                     os.makedirs(dir2)
                 if not os.path.exists(dir3):
-                    print dir3
                     os.makedirs(dir3)
                 if _lvl1 not in finalPats:
                     finalPats.append(_lvl1)

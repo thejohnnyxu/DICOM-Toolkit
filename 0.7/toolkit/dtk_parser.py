@@ -73,19 +73,21 @@ class Parser():
 
     def removeFirstLast(self, text):
         '''Removes the first and last characters in the string'''
-        text = text[1:-1]
-        return text
+        if text:
+            text = text[1:-1]
+            return text
         
     def removeUnicode(self, text):
-        if text[0] == "u":
-            text = text[1:]
-        return text
+        if text:
+            if text[0] == "u":
+                text = text[1:]
+            return text
 
     def deleteOutsideSpaces(self, text):
         '''Deletes the leading and trailing spaces in text'''
-    
-        while text[0] == " ":
-            text = text[1:]
+        if text:
+            while text[0] == " ":
+                text = text[1:]
         
         length = len(text)
         while length > 0 and text[length - 1] == " ":
