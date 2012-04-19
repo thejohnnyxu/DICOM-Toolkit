@@ -632,27 +632,7 @@ class MainFrame(wx.Frame):
         
     # self.hlpBtn
     def help(self, event):
-        self.helpText = """
-Single Target Mode:
-    Select a source directory containing only one Patient.\n
-Batch Mode:
-    Select a directory containing multiple Patients, press the (Map) button. Then choose which Patient to edit from the Patients List.\n
-Creating a Map File:
-    Press the (Create Map) button and a file called mapFile.txt will be created in the directory the toolkit is currently running from.\n
-Editing the Map File:
-    Each patient is composed of a 4 Line block in the Map file, each line with a specific format. For a complete list of Tags click the (DICOM Tags) button.
-    Note: All DICOM Tags uses the Name of the Tag rather than Keyword.\n
-    Line 1 : Name of the Patient
-    Line 2 : List of Tags that are to be sanitized.
-        Format: ["Tag1", "Tag2"] - Each Tag name has to be within quotes, seperated by commas.
-    Line 3 : Pairs of Tags and their new values.
-        Format: {"Tag1" : "Value1", "Tag2" : "Value2"} - Each Tag is paired with a new value by using a ":", each pair is seperated by commas.
-    Line 4 : List of Comments to be added.
-        Format: ["Comment1", "Comment2"] - Comments are written inside quotes, seperated by commas.\n
-Loading the Map File:
-    Press the (Load Map) button and all the settings from the Map file will be loaded into the toolkit. It is possible to make further changes with the toolkit or Batch Process with the settings of the Map file.
-"""
-        wx.MessageBox(self.helpText, "User's Guide", wx.OK | wx.ICON_INFORMATION)
+       webbrowser.open('file:/Users/jxu1/Documents/DICOM/dtk/0.7/toolkit/docs/readme.html')
 
 # ------------------------------
 def _genTags():

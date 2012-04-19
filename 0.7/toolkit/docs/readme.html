@@ -1,0 +1,69 @@
+<html>
+<title>DICOM Toolkit User's Guide</title>
+
+<style type="text/css">
+
+	#container { margin: auto; 
+				 font-family: "Arial", Helvetica, sans-serif;
+				 padding: 5px 20px; }
+				 
+	#header { padding-bottom: 20px; }			 
+				 
+	#content { float: left; 
+			   width: 800px; }
+	
+	ul.group { font-size: 15px;
+			   list-style-type: none; }
+
+	h1 { font-size: 25px;
+		 color: #990000; 
+	     text-decoration:underline; } 
+		 
+	h2 { font-size: 30px;
+		 color: #990000; 
+		 text-decoration:underline; }  	
+		 
+ 	li { margin-left: 0;
+ 	     margin-right: 10%;
+		 margin-top: .5em;
+		 margin-bottom: .5em; }
+	
+		 
+	.frame { padding: 5px; 
+			 border: 1px solid #aaa; }
+</style>
+
+<div id="container">
+	<div id="header">
+		<h2>DICOM Toolkit User's Guide</h2>	
+	</div>
+	<div id="content">
+		<ul class="group">
+			<img src="directory.png" alt="Directory Selection" class="frame"/>
+			<li><h1>A - Directory Selection</h1></li>
+			<li>Single Target Mode : Set the Source Directory to a folder containing only one source Patient.</li>
+			<li>Batch Mode : Set the Source Directory to a folder containing multiple source Patients. Batch mode requires that mapping of all the Patients before they may be Batch processed.</li>
+			<img src="tageditor.png" alt="Tag Editor" class="frame"/>
+			<li><h1>B - Tag Editor</h1></li>
+			<li>Single Target Mode : It is not necessary to select a patient, the changes will be within the scope of the Source Directory (Caution: Make sure to select only one Patient).</li>
+			<li>Batch Mode : After Mapping the Source Directory, the Patients List will be populated with all unique Patients from the Source Directory. Select a Patient and proceed to use the toolkit the same way as single target mode.</li>
+			<li>The second dropdown menu selects Tag Groups by their group bytes, this will navigate to different tags to be editted in the left checklist box.</li>
+			<li>Santize a Tag : Click it in the left checklist box. If a Tag is checked, it will be santized when Processed. </li>
+			<li>Edit a Tag: Click on the desired Tag (The selected Tag will be displayed in the box under the left checklist box), enter a new value for that Tag in the Input Field, then click the Edit Tag button to save the changes.</li>
+			<li>All edited Tags will be listed in the right list box. They may be selected and editted from there as well.</li>
+			<li>If you wish to no longer change the value of a Tag, select the desired Tag in the right list box and remove it with the Remove Edit button.</li>
+			<img src="process.png" alt="Private Tags/Processing" class="frame"/>
+			<li><h1>C - Private Tag Editor</h1></li>
+			<li>Add : Input the desired note or comment into the Input Field and press the Add button.</li>
+			<li>Remove : Select the desired tag to delete and press the Remove button.</li>
+			<li><h1>D - Processing</h1></li>
+			<li>Map : Creates a mapping of all the Patients in the Source Directory.</li>
+			<li>Load Map : Loads a Map File for batch processing</li>
+			<li>Create Map : Generates mapFile.txt from the current Mapping</li>
+			<li>Batch Process : Uses the Mapping to commit changes to the DICOM files.</li>
+			<li>Process : Commits the changes to the DICOM files</li>
+		</ul>
+	</div>
+</div>
+
+</html>
