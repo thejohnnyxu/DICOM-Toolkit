@@ -1,11 +1,6 @@
 B-PML000202
-<<<<<<< Local Changes
-["Patient's Name", "Patient's Sex", 'Patient ID']
-{"Patient's Name": 'Bill', 'Patient's Address' : '}
-=======
 ["Patient's Name", "Patient's Sex", 'Patient ID', 'Clinical Trial Protocol ID']
 {"Patient's Name": 'Bill'}
->>>>>>> External Changes
 ['Notes']
 Pfeiffer^Kay^E
 []
