@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, dicom, wx, dtk_logic, dtk_parser, webbrowser
+import sys, os, dicom, wx, dtk_logic, dtk_parser, webbrowser, time, math
 
 logic = dtk_logic.Logic()
 parser = dtk_parser.Parser()
@@ -21,7 +21,7 @@ class Process(wx.Panel):
         wx.Panel.__init__(self, parent)
         
         self.tagGroups  = ["0008", "0010 : Patient Information", "0012 : Clinical Information ", "0014", "0018", "0020", "0022", "0024", "0028",
-                        "0032", "0038", "003A", "0040", "0042", "0044", "0046", "0048", "0050",
+                        "0032 : Study Information", "0038", "003A", "0040", "0042", "0044", "0046", "0048", "0050",
                         "0052", "0054", "0060", "0062", "0064", "0066", "0068", "0070", "0072",
                         "0074", "0076", "0078", "0088", "0100", "0400", "1000", "1010", "2000",
                         "2010", "2020", "2030", "2040", "2050", "2100", "2110", "2120", "2130",
@@ -158,11 +158,19 @@ class Process(wx.Panel):
     
         for dirname, dirs, files, in sListing:
             for filename in files:
-                rFile = open(dirname + '/' + filename, 'rb')
-                self.byte = repr(rFile.read())[513:517]
-                if self.byte == 'DICM':
+                rFile = open(dirname + '/' + filename, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    print 'Processing : ' + filename
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.processTags(self, ds, dirname, tPath, filename)
+                    
+        MainFrame.refreshSource(MainFrame(), self)
+                    
+        dlg = wx.MessageDialog(self, 'Done Processing.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        dlg.ShowModal()
+        dlg.Destroy()
     
     # self.checklistbox
     def clicked(self, event):
@@ -228,9 +236,7 @@ class Process(wx.Panel):
         for pair in Process.editPair.items():
             if Process.focusedTag == pair[0]:
                 self.editTc.SetValue(pair[1])
-        
-        
-        
+                    
     # self.editTC & self.chgBtn
     def change(self, event):
         global baseTags
@@ -276,6 +282,7 @@ class Process(wx.Panel):
             Process.tagSet.append(self.rootPatient)
 
         for pat in Process.tagSet:
+            print pat[0]
             self.patientDrop.Append(pat[0])
    
         self.refreshChecklist()
@@ -397,43 +404,69 @@ class Process(wx.Panel):
                     for tag in pat[1]:
                         if key == tag:
                             pat[1].remove(tag)
-                    
-        print Process.tagSet
         
-        self.refreshChecklist()
-                    
+        self.refreshChecklist()           
         
     def batch(self, event):
         global sListing, root, filename, tPath, dirname, dirs
         
         for dirname, dirs, files, in sListing:
             for filename in files:
-                rFile = open(dirname + '/' + filename, 'rb')
-                self.byte = repr(rFile.read())[513:517]
-                if self.byte == 'DICM':
+                rFile = open(dirname + '/' + filename, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    print 'Batch : ' + filename
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
-                    
+        
         self.genMap(self)
+        MainFrame.refreshSource(MainFrame(), self)
+        
+        dlg = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        dlg.ShowModal()
+        dlg.Destroy()
+        
                     
     def mapper(self, event):
-        global tPath, baseTags
+        global tPath, baseTags, sListing
         
         Process.checkedTags = []
         Process.editPair    = {}
+        Process.tagSet      = []
+        self.patientDrop.Clear()
         
+      
         # Uncheck everything
         for idx1, val1, in enumerate(Process.cachedTags):
             self.tagCLBox.Check(idx1, 0)
-        
+
         for dirname, dirs, files, in sListing:
             for filename in files:
-                rFile = open(dirname + '/' + filename, 'rb')
-                self.byte = repr(rFile.read())[513:517]
-                if self.byte == 'DICM':
+                rFile = open(dirname + '/' + filename, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    print 'Mapping : ' + filename
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.mapper(self, ds, tPath, baseTags)
-                rFile.close()
+                    
+        MainFrame.refreshSource(MainFrame(), self)
+        
+        dlg = wx.MessageDialog(self, 'Done Mapping.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        dlg.ShowModal()
+        dlg.Destroy()
+        
+    def isDICM(self, bin, filename):
+        bin = bin.split("\\")
+        
+        if "x00DICM" in bin:
+            if filename == 'DICOMDIR':
+                return False
+            if filename.endswith(".dcm") or filename.endswith(".DCM") or "." not in filename:
+                return True
+        else:
+            return False
                     
     def genMap(self, event):
         
@@ -455,7 +488,7 @@ class Process(wx.Panel):
 class Batch(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-
+        
 # ------------------------------
 class MainFrame(wx.Frame):
     def __init__(self):
@@ -562,13 +595,12 @@ class MainFrame(wx.Frame):
             sListing    = os.walk(sPath)
             
             srcTc.SetValue(sPath)
-        
         self.dlg.Destroy()
     
     def setDest(self, event):
         global tPath, tListing
         
-        self.dlg = wx.DirDialog(self, "Choose the Source Directory:", style=wx.DD_DEFAULT_STYLE)
+        self.dlg = wx.DirDialog(self, "Choose the Target Directory:", style=wx.DD_DEFAULT_STYLE)
         
         if self.dlg.ShowModal() == wx.ID_OK:
             tPath = self.dlg.GetPath() + '/'
@@ -621,8 +653,6 @@ Loading the Map File:
     Press the (Load Map) button and all the settings from the Map file will be loaded into the toolkit. It is possible to make further changes with the toolkit or Batch Process with the settings of the Map file.
 """
         wx.MessageBox(self.helpText, "User's Guide", wx.OK | wx.ICON_INFORMATION)
-    
-    
 
 # ------------------------------
 def _genTags():
