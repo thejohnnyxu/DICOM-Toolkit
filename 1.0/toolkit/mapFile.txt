@@ -1,16 +1,3 @@
-B-PML000202
-["Patient's Name", "Patient's Sex", 'Patient ID', 'Clinical Trial Protocol ID']
-{"Patient's Name": 'Bill'}
-['Notes']
-Pfeiffer^Kay^E
-[]
-{}
-[]
-DPS                      
-[]
-{}
-[]
-Roger
-[]
+S^M
 {}
 []

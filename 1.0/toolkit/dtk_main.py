@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
-#TODO combine tagPairs and checkedList in tagSet
-#TODO remove syntax in mapFile
-
-import sys, os, dicom, wx, dtk_logic, dtk_parser, webbrowser, time, math
+import sys, os, dicom, wx, dtk_logic, dtk_parser, webbrowser
 
 logic = dtk_logic.Logic()
 parser = dtk_parser.Parser()
@@ -12,7 +9,6 @@ parser = dtk_parser.Parser()
 class Process(wx.Panel):
     
     cachedTags      = []
-    checkedTags     = []
     currentPatient  = ""
     focusedTag      = ""
     insertTags      = []
@@ -145,7 +141,7 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.privTags,   id=131)
         self.Bind(wx.EVT_COMBOBOX, self.setPatient, id=122)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect,   id=121)
-        self.addTc.Bind(wx.EVT_SET_FOCUS,   self.clearField)
+        self.addTc.Bind(wx.EVT_SET_FOCUS, self.clearField)
         
         # Initial Settings
         self.SetSizer(self.container)
@@ -153,9 +149,36 @@ class Process(wx.Panel):
         self.removePrivate = True
         self.tagsDrop.SetValue('0010 : Patient Information')
         self.patientDrop.SetValue('Patients List')
-
+    
     # Handlers
-    # self.proBtn
+        
+    # Map Button
+    def mapper(self, event):
+        global tPath, baseTags, sListing
+
+        Process.editPair    = {}
+        Process.tagSet      = []
+        self.patientDrop.Clear()
+        
+        for idx1, val1, in enumerate(Process.cachedTags):
+            self.tagCLBox.Check(idx1, 0)
+
+        for dirname, dirs, files, in sListing:
+            for filename in files:
+                rFile = open(dirname + '/' + filename, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    ds = dicom.read_file(dirname +'/'+ filename)
+                    logic.mapper(self, ds, tPath, baseTags)
+                    
+        MainFrame.refreshSource(MainFrame(), self)
+        
+        dlg = wx.MessageDialog(self, 'Done Mapping.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    # Process Button
     def process(self, event):
         global sListing, root, filename, tPath, dirname, dirs
     
@@ -164,7 +187,6 @@ class Process(wx.Panel):
                 rFile = open(dirname + '/' + filename, 'rb').read()
                 self.byte = repr(rFile)
                 if self.isDICM(self.byte, filename):
-                    print 'Processing : ' + filename
                     ds = dicom.read_file(dirname +'/'+ filename)
                     logic.processTags(self, ds, dirname, tPath, filename)
                     
@@ -174,7 +196,29 @@ class Process(wx.Panel):
         
         dlg.ShowModal()
         dlg.Destroy()
-    
+
+    # Batch Process Button
+    def batch(self, event):
+        global sListing, root, filename, tPath, dirname, dirs
+        
+        self.genMap(self)
+        
+        for dirname, dirs, files, in sListing:
+            for filename in files:
+                rFile = open(dirname + '/' + filename, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    ds = dicom.read_file(dirname +'/'+ filename)
+                    logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
+        
+        
+        MainFrame.refreshSource(MainFrame(), self)
+        
+        dlg = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        dlg.ShowModal()
+        dlg.Destroy()
+        
     # self.checklistbox
     def clicked(self, event):
 
@@ -186,20 +230,25 @@ class Process(wx.Panel):
         self.tagTc.SetValue(Process.focusedTag)
         
         if self.tagCLBox.IsChecked(self.id):
-            if self.tag not in Process.checkedTags:
-                Process.checkedTags.append(self.tag)
+            if self.tag not in Process.editPair.keys():
+                Process.editPair[self.tag] = ''
         else:
-            Process.checkedTags.remove(self.tag)
+            Process.editPair.remove(self.tag)
             
         if Process.editPair.has_key(Process.focusedTag):
             self.editTc.SetValue(Process.editPair[Process.focusedTag])
         else:
             self.editTc.Clear()
             
+        self.refreshChecklist()
+    
+    # Displays is the values of selected Tag in self.changedLBox
     def displayValue(self, event):
+        
         self.id = event.GetSelection()
-        Process.focusedTag = self.changedLBox.GetString(self.changedLBox.GetSelection())      
-        self.tag = self.changedLBox.GetString(self.id)
+        self.tag = self.changedLBox.GetString(self.id).split(" => ")
+        
+        Process.focusedTag = self.tag[0]
         
         self.tagTc.SetValue(Process.focusedTag)
             
@@ -208,11 +257,14 @@ class Process(wx.Panel):
         else:
             self.editTc.Clear()
             
+    # Help Button
     def launchLink(self, event):
         webbrowser.open('http://www.dicomtags.com/dicom-standard/09_06pu3.php')
         
-    # Helper function for change
+    # Refreshes self.tagCLBox
     def refreshChecklist(self):
+        
+        self.displayList = []
         
         self.curSelc        = self.tagsDrop.GetValue()[:4]
         self.checked        = self.tagCLBox.GetChecked()
@@ -228,10 +280,14 @@ class Process(wx.Panel):
                 Process.cachedTags.append(pair[1])
         
         self.tagCLBox.InsertItems(items=Process.cachedTags, pos=0)
-        self.changedLBox.InsertItems(items=Process.editPair.keys(), pos=0)
         
-        # Checks all tags from _Process.checkedTags in _cacheTags
-        for idx1, val1, in enumerate(Process.checkedTags):
+        for pair in Process.editPair.items():
+
+            self.displayList.append(pair[0] + " => " + pair[1])
+            
+        self.changedLBox.InsertItems(items=self.displayList, pos=0)
+        
+        for idx1, val1, in enumerate(Process.editPair.keys()):
             for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
@@ -248,49 +304,68 @@ class Process(wx.Panel):
         
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
-                pat[2] = Process.editPair
+                pat[1] = Process.editPair
             
         self.editTc.Clear()
+        self.refreshChecklist()
+        
+    # Remove edited value for selected Tag
+    def removeEdit(self, event):
+        curSelc = self.changedLBox.GetSelection()
+        self.val = self.changedLBox.GetString(curSelc)
+        
+        self.changedLBox.Delete(curSelc)
+        
+        for pat in Process.tagSet:
+            for key in Process.editPair.keys():
+                if key == self.val:
+                    del Process.editPair[key]
+                    for tag in pat[1]:
+                        if key == tag:
+                            pat[1].remove(tag)
+        
         self.refreshChecklist()
     
     # self.preBtn           
     def loadMap(self, event):
-        mapFile = open('mapfile.txt', 'r')
+        
+        dlg = wx.FileDialog(self, "Choose a file", os.getcwd(), "", "*.*", wx.OPEN)
+        
+        if dlg.ShowModal() == wx.ID_OK:
+            _path = dlg.GetPath()
+            _mypath = os.path.basename(_path)
+        dlg.Destroy()
+        
+        mapFile = open(_path, 'r')
         
         self.patientDrop.Clear()
         
         Process.tagSet      = []
         self.tmpFile        = []
         self.patientName    = ""
-        self.checkedList    = []
         self.tagPairs       = {}
         self.rootPatient    = []
         
         self.mapFile = mapFile.readlines()
 
-        self.mapFile = self.chunks(self.mapFile, 4)
+        self.mapFile = self.chunks(self.mapFile, 3)
         
         for pat in self.mapFile:
             self.patientName    = parser.parseCode(pat[0])
-            self.checkedList    = parser.parseCode(pat[1])
-            self.tagPairs       = parser.parseCode(pat[2])
-            self.insertTags     = parser.parseCode(pat[3])
+            self.tagPairs       = parser.parseCode(pat[1])
+            self.insertTags     = parser.parseCode(pat[2])
             
-            for tag in self.tagPairs.keys():
-                if tag not in self.checkedList:
-                    self.checkedList.append(tag)
-            
-            self.rootPatient = [self.patientName, self.checkedList, self.tagPairs, self.insertTags]
+            self.rootPatient = [self.patientName, self.tagPairs, self.insertTags]
             
             Process.tagSet.append(self.rootPatient)
 
         for pat in Process.tagSet:
-            print pat[0]
             self.patientDrop.Append(pat[0])
    
         self.refreshChecklist()
         mapFile.close()
-        
+    
+    # Creates chunks from the Map File
     def chunks(self, givenList, groupSize):
         return [givenList[i:i+groupSize] for i in range(0, len(givenList), groupSize)]
 
@@ -312,14 +387,14 @@ class Process(wx.Panel):
         
         self.tagCLBox.InsertItems(items=Process.cachedTags, pos=0)
         
-        # Checks all tags from Process.checkedTags in Process.cachedTags
-        for idx1, val1, in enumerate(Process.checkedTags):
+        for idx1, val1, in enumerate(Process.editPair.keys()):
             for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
                     
         self.refreshChecklist()
-                        
+        
+    # Sets the Patient in Patient Dropdown
     def setPatient(self, event):
 
         Process.currentPatient = self.patientDrop.GetValue()
@@ -333,28 +408,25 @@ class Process(wx.Panel):
         
         self.tagLBox.Clear()
         
-        # Sets Process.checkedTags and Process.editPair for the Process.currentPatient
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
-                Process.checkedTags = pat[1]
-                Process.editPair    = pat[2]
-                Process.insertTags  = pat[3]
+                Process.editPair    = pat[1]
+                Process.insertTags  = pat[2]
                 
-        for idx1, val1, in enumerate(Process.checkedTags):
+        for idx1, val1, in enumerate(Process.editPair.keys()):
             for idx2, val2, in enumerate(Process.cachedTags):
                 if val1 == val2:
                     self.tagCLBox.Check(idx2)
                     
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
-                for entry in pat[3]:
+                for entry in pat[2]:
                     self.tagLBox.Append(entry)
         
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
-                pat[1] = Process.checkedTags
-                pat[2] = Process.editPair
-                pat[3] = Process.insertTags
+                pat[1] = Process.editPair
+                pat[2] = Process.insertTags
                 
         self.refreshChecklist()
                        
@@ -371,9 +443,9 @@ class Process(wx.Panel):
         self.tag    = self.tagCLBox.GetString(self.id)
         
         if self.tagCLBox.IsChecked(self.id):
-            Process.checkedTags.append(self.tag)
+            Process.editPair[self.tag] = ''
         else:
-            Process.checkedTags.remove(self.tag)
+            Process.editPair.remove(self.tag)
         
     # self.addBtn
     def add(self, event):
@@ -394,71 +466,10 @@ class Process(wx.Panel):
 
         Process.insertTags.remove(self.val)
         
-    def removeEdit(self, event):
-        curSelc = self.changedLBox.GetSelection()
-        self.val = self.changedLBox.GetString(curSelc)
+     
         
-        self.changedLBox.Delete(curSelc)
-        
-        for pat in Process.tagSet:
-            for key in Process.editPair.keys():
-                if key == self.val:
-                    del Process.editPair[key]
-                    for tag in pat[1]:
-                        if key == tag:
-                            pat[1].remove(tag)
-        
-        self.refreshChecklist()           
-        
-    def batch(self, event):
-        global sListing, root, filename, tPath, dirname, dirs
-        
-        for dirname, dirs, files, in sListing:
-            for filename in files:
-                rFile = open(dirname + '/' + filename, 'rb').read()
-                self.byte = repr(rFile)
-                if self.isDICM(self.byte, filename):
-                    print 'Batch : ' + filename
-                    ds = dicom.read_file(dirname +'/'+ filename)
-                    logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
-        
-        self.genMap(self)
-        MainFrame.refreshSource(MainFrame(), self)
-        
-        dlg = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-        
-        dlg.ShowModal()
-        dlg.Destroy()
-        
-                    
-    def mapper(self, event):
-        global tPath, baseTags, sListing
-        
-        Process.checkedTags = []
-        Process.editPair    = {}
-        Process.tagSet      = []
-        self.patientDrop.Clear()
-        
-      
-        # Uncheck everything
-        for idx1, val1, in enumerate(Process.cachedTags):
-            self.tagCLBox.Check(idx1, 0)
-
-        for dirname, dirs, files, in sListing:
-            for filename in files:
-                rFile = open(dirname + '/' + filename, 'rb').read()
-                self.byte = repr(rFile)
-                if self.isDICM(self.byte, filename):
-                    print 'Mapping : ' + filename
-                    ds = dicom.read_file(dirname +'/'+ filename)
-                    logic.mapper(self, ds, tPath, baseTags)
-                    
-        MainFrame.refreshSource(MainFrame(), self)
-        
-        dlg = wx.MessageDialog(self, 'Done Mapping.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-        
-        dlg.ShowModal()
-        dlg.Destroy()
+   
+    
         
     def isDICM(self, bin, filename):
         bin = bin.split("\\")
@@ -473,7 +484,14 @@ class Process(wx.Panel):
                     
     def genMap(self, event):
         
-        mapFile = open('mapFile.txt', 'wb')
+        dlg = wx.TextEntryDialog(self, "Name the Map File", "")
+
+        if dlg.ShowModal() == wx.ID_OK:
+            mapFileName = dlg.GetValue()
+            mapFileName += '.txt'
+        dlg.Destroy()
+        
+        mapFile = open(mapFileName, 'wb')
         
         for pat in Process.tagSet:
             for line in pat:
@@ -483,7 +501,7 @@ class Process(wx.Panel):
                 mapFile.write(line + "\n")
                 
         mapFile.close()
-                
+        
     def clearField(self, event):
         self.addTc.Clear()
 

@@ -31,11 +31,10 @@ class Logic():
 
         for pat in Logic.finalPatients:
             self.patientName    = pat
-            self.checkedList    = []
             self.tagPairs       = {}
             self.insertTags     = []
             
-            rootPatient = [self.patientName, self.checkedList, self.tagPairs, self.insertTags]
+            rootPatient = [self.patientName, self.tagPairs, self.insertTags]
             
             if rootPatient not in ui.tagSet:
                 ui.tagSet.append(rootPatient)
@@ -54,9 +53,6 @@ class Logic():
 
         # Blanks all checked Tags 
         for data_element in dataset:
-            for tag in ui.checkedTags:
-                if tag == data_element.name:
-                    data_element.value = ''
             for tag in ui.editPair.items():
                 if tag[0] == data_element.name:
                     data_element.value = tag[1]
@@ -101,16 +97,13 @@ class Logic():
                 for pat in tagSet:
                     if pat[0] == self.currentDS:
                         _name = pat[0]
-                        for tag in pat[2].items():
+                        for tag in pat[1].items():
                             if tag[0] == "Patient's Name":
                                 _name = tag[1]
-                        for tag in pat[1]:
-                            if tag == data_element.name:
-                                data_element.value = ''
-                        for tag in pat[2].items():
+                        for tag in pat[1].items():
                             if tag[0] == data_element.name:
                                 data_element.value = tag[1]
-                        for value in pat[3]:
+                        for value in pat[2]:
                             tagLoc += 1
                             dataset.AddNew([0x0045, tagLoc], 'UT', value)
                     tagLoc = 0x10a0
