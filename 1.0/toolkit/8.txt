@@ -1,0 +1,312 @@
+109-001-JWC-24
+{}
+[]
+MRB
+{}
+[]
+FSM
+{}
+[]
+CJC
+{}
+[]
+MRH
+{}
+[]
+RC
+{}
+[]
+CE 20-5-48
+{}
+[]
+DLD
+{}
+[]
+DPM
+{}
+[]
+DDV
+{}
+[]
+EHK
+{}
+[]
+BWH
+{}
+[]
+10/09/55/RWT
+{}
+[]
+12/04/52/OFK
+{}
+[]
+27/02/53/DAR
+{}
+[]
+08/04/55/HP
+{}
+[]
+27/08/1954/MJP
+{}
+[]
+29/09/58/CAH
+{}
+[]
+02/06/45/CD
+{}
+[]
+08/12/54/MAG
+{}
+[]
+08/05/48/BDS
+{}
+[]
+21/07/47/BJM
+{}
+[]
+MH 106-001
+{}
+[]
+RBB 106-002
+{}
+[]
+BEA 109-004
+{}
+[]
+JJT10FEB43
+{}
+[]
+GGW19JUN44
+{}
+[]
+JETO1JUL43
+{}
+[]
+DAH26FEB57
+{}
+[]
+JLS
+{}
+[]
+JAM
+{}
+[]
+NAN
+{}
+[]
+119-001
+{}
+[]
+VMP
+{}
+[]
+DRG
+{}
+[]
+BEM 26 5 43
+{}
+[]
+EMR 15 MAY 44
+{}
+[]
+GNB 29 MAR 40
+{}
+[]
+JPK
+{}
+[]
+GEP
+{}
+[]
+FLEMING, THEO
+{}
+[]
+MASHACK, MARIAN
+{}
+[]
+JMO
+{}
+[]
+TMC
+{}
+[]
+106-004SKF
+{}
+[]
+AFP03JAN47
+{}
+[]
+HRM
+{}
+[]
+JFG
+{}
+[]
+LBM
+{}
+[]
+VDP    04/20/40
+{}
+[]
+JPP
+{}
+[]
+CEK
+{}
+[]
+BCD
+{}
+[]
+KLA
+{}
+[]
+RHH
+{}
+[]
+RH
+{}
+[]
+R-D
+{}
+[]
+HFH
+{}
+[]
+DAH
+{}
+[]
+DLW
+{}
+[]
+203-006-ELA
+{}
+[]
+GML
+{}
+[]
+SBO
+{}
+[]
+203-009-TEF
+{}
+[]
+CMA
+{}
+[]
+TENNANT,BEVERLY F56      
+{}
+[]
+TENNANT, BEVERLY
+{}
+[]
+LIBUTTI,ROBERT M53       
+{}
+[]
+LIBUTTI,ROBERT
+{}
+[]
+P-A 127012               
+{}
+[]
+127-012 P-A
+{}
+[]
+201-000-c-t              
+{}
+[]
+201-011-C-T
+{}
+[]
+201-000-E-D              
+{}
+[]
+201-012-E-D
+{}
+[]
+201-000-R-V              
+{}
+[]
+201-013-R-V
+{}
+[]
+EAM 202                  
+{}
+[]
+EAM 202-006              
+{}
+[]
+Hauerstein Christoph     
+{}
+[]
+Hauerstein,Christoph     
+{}
+[]
+Muehlhuber Ottilie       
+{}
+[]
+Muehlhuber,Ottilie       
+{}
+[]
+BOLLINGER Stephan        
+{}
+[]
+Bollinger Stephan        
+{}
+[]
+BLASS Heike              
+{}
+[]
+Blass,Heike              
+{}
+[]
+SLC/                     
+{}
+[]
+SLC 107-002              
+{}
+[]
+KAJ                      
+{}
+[]
+KAJ 107-003              
+{}
+[]
+DODDS KAREN
+{}
+[]
+DODDS, KAREN
+{}
+[]
+LILLO ERNEST
+{}
+[]
+BINGHAM,RODGER
+{}
+[]
+SPAGON, JOHN
+{}
+[]
+201-14-02-43-J-Y-C       
+{}
+[]
+201-003-J-Y-C            
+{}
+[]
+201-14-02-46-G-B         
+{}
+[]
+201-004-G-B              
+{}
+[]
+L.I.                     
+{}
+[]
+L.E., W
+{}
+[]
+C97-830
+{}
+[]
+M-H 307005
+{}
+[]

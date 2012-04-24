@@ -7,7 +7,7 @@ class Logic():
 
     # ------------------------------
     def mapper(self, parent, dataset, tPath, baseTags):
-        # PatientsName/StudyDescription + StudyDate/SeriesDescription + SeriesDate + SeriesTime/
+        # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
         
         ui = parent
         
@@ -25,9 +25,10 @@ class Logic():
         for e in Logic.finalPatients:
             ui.patientDrop.Append(e)
             
-        self.genTagSets(ui, dataset, baseTags)
-        
-    def genTagSets(self, ui, dataset, baseTags):
+        self.genTagSets(ui)
+    
+    # ------------------------------    
+    def genTagSets(self, ui):
 
         for pat in Logic.finalPatients:
             self.patientName    = pat
@@ -38,6 +39,10 @@ class Logic():
             
             if rootPatient not in ui.tagSet:
                 ui.tagSet.append(rootPatient)
+                
+    # ------------------------------
+    def trap(self):
+        pass
                 
     # ------------------------------
     def processTags(self, parent, dataset, dirname, tPath, filename):
@@ -76,8 +81,9 @@ class Logic():
         # Resets tagLoc    
         tagLoc = 0x10a0
     
-        dataset.save_as(newdir + "/"+ filename)
-        
+        dataset.save_as(newdir + "/" + filename)
+
+    # ------------------------------
     def batchProcess(self, parent, dataset, dirname, tPath, filename, tagSet):
         
         patients = []
@@ -129,10 +135,10 @@ class Logic():
                 else:
                     _srTime = ""
                 
-                group = (_name, _stDesc, _stID, _srDesc, _srNum, _srTime)
+                patient = (_name, _stDesc, _stID, _srDesc, _srNum, _srTime)
 
-                if group not in patients:
-                    patients.append(group)
+                if patient not in patients:
+                    patients.append(patient)
             except AttributeError:
                 break
                 

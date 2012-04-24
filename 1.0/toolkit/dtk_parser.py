@@ -50,6 +50,9 @@ class Parser():
 
     def parseCode(self, text):
         '''Parse a string into a dictionary, number, or string'''
+        if text == "":
+            print "pass"
+        
         text = self.deleteOutsideSpaces(text)
         text = text.strip("\n")
         text = text.strip("\\")
