@@ -8,7 +8,7 @@ class Logic():
     # ------------------------------
     def mapper(self, parent, dataset, tPath, baseTags):
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
-        
+
         ui = parent
         
         # Creates each group node for each patient
@@ -29,7 +29,6 @@ class Logic():
     
     # ------------------------------    
     def genTagSets(self, ui):
-
         for pat in Logic.finalPatients:
             self.patientName    = pat
             self.tagPairs       = {}

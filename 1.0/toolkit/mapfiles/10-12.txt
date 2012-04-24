@@ -340,3 +340,270 @@ I-H 307-008
 D-S 307-012
 {}
 []
+R.U. WEIBL.
+{}
+[]
+E.U.WEIBL.
+{}
+[]
+G.S.MAENNL.
+{}
+[]
+C.M.,WEIBL.
+{}
+[]
+R.A.
+{}
+[]
+Z.M.MAENNL.
+{}
+[]
+H.G. MAENNL.
+{}
+[]
+M.W. WEIBL.
+{}
+[]
+Messmer,Edeltraud
+{}
+[]
+Dietz,Richard
+{}
+[]
+Gebhart Elke
+{}
+[]
+Ringer,Monika
+{}
+[]
+Straub Robert
+{}
+[]
+Uhlmann,Gisela
+{}
+[]
+Faerber Werner
+{}
+[]
+Wittmann Hans-Peter
+{}
+[]
+Hauerstein Christoph
+{}
+[]
+Muehlhuber,Ottilie
+{}
+[]
+Kleine Giesela
+{}
+[]
+Bollinger Stephan
+{}
+[]
+Blass,Heike
+{}
+[]
+Wagner Gerhard
+{}
+[]
+Wildenauer Dora
+{}
+[]
+GIBSON, BRUCE
+{}
+[]
+SWENSON, DELPHIA
+{}
+[]
+ROSENBAUM, LINDA
+{}
+[]
+FENSON, JANET
+{}
+[]
+BENTON, MARY E
+{}
+[]
+ZBLEWSKI, CATHERINE M
+{}
+[]
+Pt # 106-003 KS
+{}
+[]
+112 007 N-S
+{}
+[]
+EHK
+{}
+[]
+CBS
+{}
+[]
+ASB
+{}
+[]
+LVT   12-JUL-57
+{}
+[]
+CEG  12-JUN-45
+{}
+[]
+RIZZO LESLY 128008
+{}
+[]
+JWB-128011
+{}
+[]
+CSB128012
+{}
+[]
+DEH
+{}
+[]
+FHA
+{}
+[]
+201-011-C-T
+{}
+[]
+201-012-E-D
+{}
+[]
+201-013-R-V
+{}
+[]
+I.L. WEIBL.
+{}
+[]
+G-A 307001
+{}
+[]
+310 015 GHH
+{}
+[]
+107-002/SLC
+{}
+[]
+107-003/KAJ
+{}
+[]
+JDS
+{}
+[]
+DFV
+{}
+[]
+127001SFM
+{}
+[]
+127003-CSC
+{}
+[]
+U-B,307-018
+{}
+[]
+LJF102-007
+{}
+[]
+NELSON, DANA  M50
+{}
+[]
+COTTON, JEANNETTE L
+{}
+[]
+GERRY, KATHLEEN    52F
+{}
+[]
+TENNANT,BEVERLY
+{}
+[]
+LIBUTTI,ROBERT
+{}
+[]
+7 JUN 51 BSG
+{}
+[]
+ILYASHOV,ANATOLI
+{}
+[]
+KOTKOFF,ELLEN
+{}
+[]
+MEEKS,LINDA 45
+{}
+[]
+MEEKS,LINDA
+{}
+[]
+HOLLAR,BONNIE N
+{}
+[]
+HOLLAR,BONNIE
+{}
+[]
+GARTENLAUB,DANA D
+{}
+[]
+GARTENLAUB,DANA
+{}
+[]
+MITCHELL,ANNA 53
+{}
+[]
+MITCHELL,ANNA
+{}
+[]
+KAYE,LAWRENCE/52
+{}
+[]
+KAYE,LAWRENCE 53
+{}
+[]
+E D S
+{}
+[]
+P L D
+{}
+[]
+J E N
+{}
+[]
+j e v
+{}
+[]
+H G M
+{}
+[]
+H G. M.
+{}
+[]
+F C N
+{}
+[]
+A E C
+{}
+[]
+AEC
+{}
+[]
+A G M
+{}
+[]
+C N L
+{}
+[]
+DNV
+{}
+[]
+D N V
+{}
+[]
+G N E
+{}
+[]
+A G P
+{}
+[]
+ILYASHOV,ANATOLI/49
+{}
+[]

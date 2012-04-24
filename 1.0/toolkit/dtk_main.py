@@ -132,7 +132,7 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.batch,        id=106)
         self.Bind(wx.EVT_BUTTON, self.mapper,       id=107)
         self.Bind(wx.EVT_BUTTON, self.genMap,       id=108)
-        self.Bind(wx.EVT_BUTTON, self.anonymize,   id=109)
+        self.Bind(wx.EVT_BUTTON, self.anonymize,    id=109)
         self.Bind(wx.EVT_BUTTON, self.removeEdit,   id=110)
         self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=151)
         self.Bind(wx.EVT_LISTBOX, self.clicked,     id=151)
@@ -156,16 +156,23 @@ class Process(wx.Panel):
     def mapper(self, event):
         global tPath, baseTags, sListing  
         
+        print "1", Process.tagSet
         Process.editPair    = {}
         Process.tagSet      = []
+        logic.finalPatients = []
+        timeStamp           = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+        logName             = "logs/runlog_" + timeStamp + ".txt"  
+        errorFile           = open(logName, 'wb')
+        isMissing           = False
+        print "2", Process.tagSet
+        
         self.patientDrop.Clear()
-        timeStamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-        logName = "runlog_" + timeStamp + ".txt"  
-        errorFile = open(logName, 'wb')
-        isMissing = False
         
         dlg1 = wx.MessageDialog(self, 'Mapping the Source Directory may take a long time. Do you want to continue?', 'Mapping', wx.ICON_QUESTION | wx.YES_NO | wx.YES_DEFAULT)
-        errorFile.write("The following files are flagged for not having a Patient\'s Name\n")
+        dlg2 = wx.MessageDialog(self, 'The program has finished mapping the source directory.', 'Done Mapping!', wx.OK | wx.ICON_INFORMATION)
+        dlg3 = wx.MessageDialog(self, 'There were files without a Patient\'s Name, please check the runlog.txt for more information', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        errorFile.write("The following files are flagged for not having a Patient\'s Name:\n")
         
         if dlg1.ShowModal() == wx.ID_YES:
             dlg1.Destroy()
@@ -187,13 +194,12 @@ class Process(wx.Panel):
                             logic.mapper(self, ds, tPath, baseTags)
             
             if isMissing:
-                dlg3 = wx.MessageDialog(self, 'There were files without a Patient\'s Name, please check the runlog.txt for more information', 'Notice!', wx.OK | wx.ICON_INFORMATION)
                 dlg3.ShowModal()
                 dlg3.Destroy()
             
-            dlg2 = wx.MessageDialog(self, 'The program has finished mapping the source directory.', 'Done Mapping!', wx.OK | wx.ICON_INFORMATION)
             dlg2.ShowModal()
             dlg2.Destroy()
+            print "3", Process.tagSet
 
     # ------------------------------
     # Process Button
@@ -283,7 +289,7 @@ class Process(wx.Panel):
     # ------------------------------        
     # self.anoBtn
     def anonymize(self, event):
-        print datetime.datetime.now()
+        print Process.tagSet
         
     
     # ------------------------------    
@@ -339,8 +345,8 @@ class Process(wx.Panel):
     # ------------------------------    
     # Remove edited value for selected Tag
     def removeEdit(self, event):
-        curSelc = self.changedLBox.GetSelection()
-        self.val = self.changedLBox.GetString(curSelc)
+        curSelc     = self.changedLBox.GetSelection()
+        self.val    = self.changedLBox.GetString(curSelc)
         
         self.changedLBox.Delete(curSelc)
         
@@ -380,7 +386,6 @@ class Process(wx.Panel):
         self.mapFile = self.chunks(self.mapFile, 3)
         
         for pat in self.mapFile:
-            print pat
             self.patientName    = parser.parseCode(pat[0])
             self.tagPairs       = parser.parseCode(pat[1])
             self.insertTags     = parser.parseCode(pat[2])
@@ -526,7 +531,7 @@ class Process(wx.Panel):
             mapFileName += '.txt'
         dlg.Destroy()
         
-        mapFile = open(mapFileName, 'wb')
+        mapFile = open("mapfiles/" + mapFileName, 'wb')
         
         for pat in Process.tagSet:
             for line in pat:
