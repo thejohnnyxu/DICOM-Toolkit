@@ -6,39 +6,40 @@ class Logic():
     finalPatients = []
 
     # ------------------------------
-    def mapper(self, parent, dataset, tPath, baseTags):
+    def mapper(self, parent, dataset):
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
 
         ui = parent
-        Logic.finalPatients = []
         
         # Creates each group node for each patient
         for data_element in dataset:
             try:
-                name = dataset.PatientsName
-                if name not in Logic.finalPatients:
-                    Logic.finalPatients.append(name)
+                _name   = dataset.PatientsName
+                if _name not in Logic.finalPatients:
+                    Logic.finalPatients.append(_name)
             except AttributeError:
                 break     
 
         # Populates patientDrop in Process
         ui.patientDrop.Clear()
-        for e in Logic.finalPatients:
-            ui.patientDrop.Append(e)
-            
-        self.genTagSets(ui)
-    
+        for patID in Logic.finalPatients:
+            print "patID : ", patID
+            ui.patientDrop.Append(patID)
+        
     # ------------------------------    
     def genTagSets(self, ui):
         for pat in Logic.finalPatients:
-            self.patientName    = pat
+            print 'genTagSets : ', pat
+            self.patientID      = pat
             self.tagPairs       = {}
             self.insertTags     = []
             
-            rootPatient = [self.patientName, self.tagPairs, self.insertTags]
+            rootPatient = [self.patientID, self.tagPairs, self.insertTags]
             
             if rootPatient not in ui.tagSet:
                 ui.tagSet.append(rootPatient)
+                
+            Logic.finalPatients = []
                 
     # ------------------------------
     def trap(self):

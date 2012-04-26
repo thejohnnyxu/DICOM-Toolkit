@@ -154,17 +154,17 @@ class Process(wx.Panel):
         
     # Map Button
     def mapper(self, event):
-        global tPath, baseTags, sListing  
+        global baseTags
         
-        print "Initial: ", Process.tagSet
+        print "I : ", Process.tagSet, logic.finalPatients
         Process.editPair    = {}
         Process.tagSet      = []
-        logic.finalPatients = []
+        isMissing           = False
+        print "A : ", Process.tagSet, logic.finalPatients
+        
         timeStamp           = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
         logName             = "logs/runlog_" + timeStamp + ".txt"  
         errorFile           = open(logName, 'wb')
-        isMissing           = False
-        print "After reset: ", Process.tagSet
         
         self.patientDrop.Clear()
         
@@ -180,7 +180,7 @@ class Process(wx.Panel):
             for idx, val, in enumerate(Process.cachedTags):
                 self.tagCLBox.Check(idx, 0)
             
-            for dirname, dirs, files, in sListing:
+            for dirname, dirs, files, in MainFrame.sListing:
                 for filename in files:
                     fPath = dirname + '/' + filename
                     rFile = open(fPath, 'rb').read()
@@ -191,24 +191,25 @@ class Process(wx.Panel):
                             errorFile.write(fPath + "\n")
                             isMissing = True
                         else:
-                            logic.mapper(self, ds, tPath, baseTags)
+                            logic.mapper(self, ds)
             
             if isMissing:
                 dlg3.ShowModal()
                 dlg3.Destroy()
+                
+            logic.genTagSets(self)
             
             dlg2.ShowModal()
             dlg2.Destroy()
-            print "Final: ", Process.tagSet
+            print "F : ", Process.tagSet, logic.finalPatients
 
     # ------------------------------
     # Process Button
     def process(self, event):
-        global sListing, root, filename, tPath, dirname, dirs
-        
+
         dlg = wx.MessageDialog(self, 'Done Processing.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
     
-        for dirname, dirs, files, in sListing:
+        for dirname, dirs, files, in MainFrame.sListing:
             for filename in files:
                 fPath = dirname + '/' + filename
                 rFile = open(fPath, 'rb').read()
@@ -216,8 +217,6 @@ class Process(wx.Panel):
                 if self.isDICM(self.byte, filename):
                     ds = dicom.read_file(fPath)
                     logic.processTags(self, ds, dirname, tPath, filename)
-                    
-        MainFrame.refreshSource(MainFrame(), self)
         
         dlg.ShowModal()
         dlg.Destroy()
@@ -225,13 +224,10 @@ class Process(wx.Panel):
     # ------------------------------
     # Batch Process Button
     def batch(self, event):
-        global sListing, root, filename, tPath, dirname, dirs
-        
-        self.genMap(self)
-        
+
         dlg = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
         
-        for dirname, dirs, files, in sListing:
+        for dirname, dirs, files, in MainFrame.sListing:
             for filename in files:
                 fPath = dirname + '/' + filename
                 rFile = open(fPath, 'rb').read()
@@ -239,9 +235,6 @@ class Process(wx.Panel):
                 if self.isDICM(self.byte, filename):
                     ds = dicom.read_file(fPath)
                     logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
-        
-        
-        MainFrame.refreshSource(MainFrame(), self)
         
         dlg.ShowModal()
         dlg.Destroy()
@@ -291,7 +284,6 @@ class Process(wx.Panel):
     def anonymize(self, event):
         print Process.tagSet
         
-    
     # ------------------------------    
     # Refreshes self.tagCLBox
     def refreshChecklist(self):
@@ -553,16 +545,14 @@ class Batch(wx.Panel):
         
 # ------------------------------
 class MainFrame(wx.Frame):
+    tPath = ''
+    sPath = ''
+    sListing = ''
+    tListing = ''
+    
     def __init__(self):
         wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))
-        
-        global tPath, sPath, tListing, sListing, srcTc, tarTc
-        
-        tPath = '/Users/jxu1/Documents/DICOM/dump/'
-        sPath = '/Users/jxu1/Documents/DICOM/sample/'
-        tListing = os.walk(tPath)
-        sListing = os.walk(sPath)
-        
+    
         # Panels
         self.panel = wx.Panel(self)
         
@@ -592,8 +582,8 @@ class MainFrame(wx.Frame):
         self.hlpBtn     = wx.Button(self.panel, 105, "User's Guide", size=(150,25))
         
         # Text Ctrl
-        srcTc = wx.TextCtrl(self.panel, 131, '', size=(600,25))
-        tarTc = wx.TextCtrl(self.panel, 132, '', size=(600,25))
+        self.srcTc = wx.TextCtrl(self.panel, 131, '', size=(600,25), style=wx.TE_READONLY)
+        self.tarTc = wx.TextCtrl(self.panel, 132, '', size=(600,25), style=wx.TE_READONLY)
         
         # Line
         self.line1 = wx.StaticLine(self.panel, -1, size=(800,1))
@@ -614,9 +604,9 @@ class MainFrame(wx.Frame):
         self.hboxA.Add(self.vboxA2, -1, wx.LEFT, 25)
         
         self.vboxA1.Add(self.srcTxt)
-        self.vboxA1.Add(srcTc)
+        self.vboxA1.Add(self.srcTc)
         self.vboxA1.Add(self.tarTxt)
-        self.vboxA1.Add(tarTc)
+        self.vboxA1.Add(self.tarTc)
         
         self.vboxA2.AddSpacer((1,18))
         self.vboxA2.Add(self.srcBtn)
@@ -637,61 +627,42 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.showP1,       id=103)
         self.Bind(wx.EVT_BUTTON, self.showP2,       id=104)
         self.Bind(wx.EVT_BUTTON, self.help,         id=105)
-        self.Bind(wx.EVT_TEXT, self.refreshSource,  id=131)
-        self.Bind(wx.EVT_TEXT, self.refreshTarget,  id=132)
         
         self.panel.SetSizer(self.container)
         
         self.Centre()
-        srcTc.WriteText(sPath)
-        tarTc.WriteText(tPath)
         
     # ------------------------------
     # Handlers
     def setSource(self, event):
-        global sPath, sListing
         
         self.dlg = wx.DirDialog(self, "Choose the Source Directory:", style=wx.DD_DEFAULT_STYLE)
         
         if self.dlg.ShowModal() == wx.ID_OK:
-            sPath       = self.dlg.GetPath() + '/'
-            sListing    = os.walk(sPath)
-            srcTc.SetValue(sPath)
+            MainFrame.sPath     = self.dlg.GetPath() + '/'
+            MainFrame.sListing  = os.walk(MainFrame.sPath)
+            self.srcTc.SetValue(MainFrame.sPath)
             
         self.dlg.Destroy()
     
     # ------------------------------
     def setDest(self, event):
-        global tPath, tListing
         
         self.dlg = wx.DirDialog(self, "Choose the Target Directory:", style=wx.DD_DEFAULT_STYLE)
         
         if self.dlg.ShowModal() == wx.ID_OK:
-            tPath = self.dlg.GetPath() + '/'
-            tListing = os.walk(tPath)
-            tarTc.SetValue(tPath)        
-            
+            MainFrame.tPath     = self.dlg.GetPath() + '/'
+            MainFrame.tListing  = os.walk(MainFrame.tPath)
+            self.tarTc.SetValue(MainFrame.tPath)
+        
         self.dlg.Destroy()
     
     # ------------------------------
-    def refreshSource(self, event):
-        global sPath, sListing
-        
-        sPath = srcTc.GetValue()
-        sListing = os.walk(sPath)
-        
-    def refreshTarget(self, event):
-        global tPath, tListing
-        
-        tPath = tarTc.GetValue()
-        tListing = os.walk(tPath)
-    
-    # ------------------------------
-    def showP1(self, even):
+    def showP1(self, event):
         self.panel_one.SetPosition((0,127))
         self.panel_one.Show()
         self.panel_two.Hide()
-    def showP2(self, even):
+    def showP2(self, event):
         self.panel_two.SetPosition((0,127))
         self.panel_one.Hide()
         self.panel_two.Show()
