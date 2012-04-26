@@ -156,7 +156,7 @@ class Process(wx.Panel):
     def mapper(self, event):
         global tPath, baseTags, sListing  
         
-        print "1", Process.tagSet
+        print "Initial: ", Process.tagSet
         Process.editPair    = {}
         Process.tagSet      = []
         logic.finalPatients = []
@@ -164,7 +164,7 @@ class Process(wx.Panel):
         logName             = "logs/runlog_" + timeStamp + ".txt"  
         errorFile           = open(logName, 'wb')
         isMissing           = False
-        print "2", Process.tagSet
+        print "After reset: ", Process.tagSet
         
         self.patientDrop.Clear()
         
@@ -199,7 +199,7 @@ class Process(wx.Panel):
             
             dlg2.ShowModal()
             dlg2.Destroy()
-            print "3", Process.tagSet
+            print "Final: ", Process.tagSet
 
     # ------------------------------
     # Process Button

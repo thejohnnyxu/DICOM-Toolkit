@@ -10,6 +10,7 @@ class Logic():
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
 
         ui = parent
+        Logic.finalPatients = []
         
         # Creates each group node for each patient
         for data_element in dataset:
