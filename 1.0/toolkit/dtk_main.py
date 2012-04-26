@@ -159,20 +159,15 @@ class Process(wx.Panel):
         print "I : ", Process.tagSet, logic.finalPatients
         Process.editPair    = {}
         Process.tagSet      = []
-        isMissing           = False
+        self.flaggedFiles   = []
+        self.isMissing           = False
         print "A : ", Process.tagSet, logic.finalPatients
-        
-        timeStamp           = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-        logName             = "logs/runlog_" + timeStamp + ".txt"  
-        errorFile           = open(logName, 'wb')
         
         self.patientDrop.Clear()
         
         self.mapInfo        = wx.MessageDialog(self, 'Mapping the Source Directory may take a long time. Do you want to continue?', 'Mapping', wx.ICON_QUESTION | wx.YES_NO | wx.YES_DEFAULT)
         self.mapDone        = wx.MessageDialog(self, 'The program has finished mapping the source directory.', 'Done Mapping!', wx.OK | wx.ICON_INFORMATION)
         self.missingName    = wx.MessageDialog(self, 'There were files without a Patient\'s Name, please check the runlog.txt for more information', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-        
-        errorFile.write("The following files are flagged for not having a Patient\'s Name:\n")
         
         if self.mapInfo.ShowModal() == wx.ID_YES:
             self.mapInfo.Destroy()
@@ -188,12 +183,20 @@ class Process(wx.Panel):
                     if self.isDICM(self.byte, filename):
                         ds = dicom.read_file(fPath)
                         if ds.PatientsName == "":
-                            errorFile.write(fPath + "\n")
-                            isMissing = True
+                            self.flaggedFiles.append(fPath)
+                            self.isMissing = True
                         else:
                             logic.mapper(self, ds)
             
-            if isMissing:
+            if self.isMissing:
+                timeStamp           = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+                logName             = "logs/runlog_" + timeStamp + ".txt"  
+                errorFile           = open(logName, 'wb')
+                errorFile.write("The following files are flagged for not having a Patient\'s Name:\n")
+                
+                for filename in self.flaggedFiles:
+                    errorFile.write(filename + "\n")
+                
                 self.missingName.ShowModal()
                 self.missingName.Destroy()
                 
@@ -378,8 +381,8 @@ class Process(wx.Panel):
         self.tagPairs       = {}
         self.rootPatient    = []
         
-        mapDir = str(mapFile.readline()).strip("\n")
-        MainFrame.setPath(MainFrame(), mapDir)
+        MainFrame.sPath = str(mapFile.readline()).strip("\n")
+        MainFrame.setPath(MainFrame())
         
         self.mapFile = mapFile.readlines()
         self.mapFile = self.chunks(self.mapFile, 3)
@@ -664,12 +667,8 @@ class MainFrame(wx.Frame):
         self.filePrompt.Destroy()
         
     # ------------------------------
-    def setPath(self, mapDir):
-        
-        MainFrame.sPath = mapDir
-        print MainFrame.sPath
-        
-        self.srcTc.SetValue(MainFrame.sPath)
+    def setPath(self):
+        self.tarTc.WriteText(MainFrame.sPath)
     
     # ------------------------------
     def showP1(self, event):
