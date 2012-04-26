@@ -23,13 +23,12 @@ class Logic():
         # Populates patientDrop in Process
         ui.patientDrop.Clear()
         for patID in Logic.finalPatients:
-            print "patID : ", patID
             ui.patientDrop.Append(patID)
         
     # ------------------------------    
     def genTagSets(self, ui):
         for pat in Logic.finalPatients:
-            print 'genTagSets : ', pat
+            print 'Final Patients : ', pat
             self.patientID      = pat
             self.tagPairs       = {}
             self.insertTags     = []
@@ -72,9 +71,8 @@ class Logic():
         root = "".join(root.split("../"))
 
         newdir = tPath + root
-        _listing = os.walk(dirname)
     
-        for dirs in _listing:
+        for dirs in os.walk(dirname):
             for subdirs in dirs:
                 if not os.path.exists(newdir):
                     os.makedirs(newdir)
@@ -144,9 +142,8 @@ class Logic():
                 break
                 
         # Creates the folder hierarchy
-        _listing = os.walk(tPath)
         try:
-            for dirs in _listing:
+            for dirs in os.walk(tPath):
                 for subdirs in dirs:
                     for patient in patients:
                         _lvl1 = patient[0]
@@ -170,4 +167,3 @@ class Logic():
             pass
         except UnicodeDecodeError:
             pass
-    

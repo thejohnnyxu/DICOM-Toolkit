@@ -27,7 +27,7 @@ class Process(wx.Panel):
                         "2200", "3002", "3004", "3006", "3008", "300A", "300C", "300E", "4000",
                         "4008", "4010", "4FFE", "50xx", "5200", "5400", "5600", "60xx", "7FE0",
                         "7Fxx", "FFFA", "FFFC", "FFFE", "0002", "0004"]
-        
+
         # Sizers
         self.container  = wx.BoxSizer(wx.VERTICAL)
         
@@ -168,19 +168,19 @@ class Process(wx.Panel):
         
         self.patientDrop.Clear()
         
-        dlg1 = wx.MessageDialog(self, 'Mapping the Source Directory may take a long time. Do you want to continue?', 'Mapping', wx.ICON_QUESTION | wx.YES_NO | wx.YES_DEFAULT)
-        dlg2 = wx.MessageDialog(self, 'The program has finished mapping the source directory.', 'Done Mapping!', wx.OK | wx.ICON_INFORMATION)
-        dlg3 = wx.MessageDialog(self, 'There were files without a Patient\'s Name, please check the runlog.txt for more information', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        self.mapInfo        = wx.MessageDialog(self, 'Mapping the Source Directory may take a long time. Do you want to continue?', 'Mapping', wx.ICON_QUESTION | wx.YES_NO | wx.YES_DEFAULT)
+        self.mapDone        = wx.MessageDialog(self, 'The program has finished mapping the source directory.', 'Done Mapping!', wx.OK | wx.ICON_INFORMATION)
+        self.missingName    = wx.MessageDialog(self, 'There were files without a Patient\'s Name, please check the runlog.txt for more information', 'Notice!', wx.OK | wx.ICON_INFORMATION)
         
         errorFile.write("The following files are flagged for not having a Patient\'s Name:\n")
         
-        if dlg1.ShowModal() == wx.ID_YES:
-            dlg1.Destroy()
+        if self.mapInfo.ShowModal() == wx.ID_YES:
+            self.mapInfo.Destroy()
         
             for idx, val, in enumerate(Process.cachedTags):
                 self.tagCLBox.Check(idx, 0)
             
-            for dirname, dirs, files, in MainFrame.sListing:
+            for dirname, dirs, files, in os.walk(MainFrame.sPath):
                 for filename in files:
                     fPath = dirname + '/' + filename
                     rFile = open(fPath, 'rb').read()
@@ -194,51 +194,56 @@ class Process(wx.Panel):
                             logic.mapper(self, ds)
             
             if isMissing:
-                dlg3.ShowModal()
-                dlg3.Destroy()
+                self.missingName.ShowModal()
+                self.missingName.Destroy()
                 
             logic.genTagSets(self)
             
-            dlg2.ShowModal()
-            dlg2.Destroy()
+            self.mapDone.ShowModal()
+            self.mapDone.Destroy()
             print "F : ", Process.tagSet, logic.finalPatients
 
     # ------------------------------
     # Process Button
     def process(self, event):
 
-        dlg = wx.MessageDialog(self, 'Done Processing.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-    
-        for dirname, dirs, files, in MainFrame.sListing:
+        self.done = wx.MessageDialog(self, 'Done Processing.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        
+        for dirname, dirs, files, in os.walk(MainFrame.sPath):
             for filename in files:
                 fPath = dirname + '/' + filename
                 rFile = open(fPath, 'rb').read()
                 self.byte = repr(rFile)
                 if self.isDICM(self.byte, filename):
                     ds = dicom.read_file(fPath)
-                    logic.processTags(self, ds, dirname, tPath, filename)
+                    logic.processTags(self, ds, dirname, MainFrame.tPath, filename)
         
-        dlg.ShowModal()
-        dlg.Destroy()
+        self.done.ShowModal()
+        self.done.Destroy()
         
     # ------------------------------
     # Batch Process Button
     def batch(self, event):
 
-        dlg = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-        
-        for dirname, dirs, files, in MainFrame.sListing:
-            for filename in files:
-                fPath = dirname + '/' + filename
-                rFile = open(fPath, 'rb').read()
-                self.byte = repr(rFile)
-                if self.isDICM(self.byte, filename):
-                    ds = dicom.read_file(fPath)
-                    logic.batchProcess(self, ds, dirname, tPath, filename, Process.tagSet)
-        
-        dlg.ShowModal()
-        dlg.Destroy()
-        
+        self.done = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        self.noMap = wx.MessageDialog(self, 'Please Map the Source Directory or Load a Map File', 'Missing Mapping!', wx.OK | wx.ICON_INFORMATION)
+
+        if not Process.tagSet:
+            self.noMap.ShowModal()
+            self.noMap.Destroy()
+        else:
+            for dirname, dirs, files, in os.walk(MainFrame.sPath):
+                for filename in files:
+                    fPath = dirname + '/' + filename
+                    rFile = open(fPath, 'rb').read()
+                    self.byte = repr(rFile)
+                    if self.isDICM(self.byte, filename):
+                        ds = dicom.read_file(fPath)
+                        logic.batchProcess(self, ds, dirname, MainFrame.tPath, filename, Process.tagSet)
+            
+            self.done.ShowModal()
+            self.done.Destroy()
+    
     # ------------------------------    
     # self.checklistbox
     def clicked(self, event):
@@ -282,17 +287,17 @@ class Process(wx.Panel):
     # ------------------------------        
     # self.anoBtn
     def anonymize(self, event):
-        print Process.tagSet
-        
+        pass
+
     # ------------------------------    
     # Refreshes self.tagCLBox
     def refreshChecklist(self):
         
-        self.displayList = []
+        self.displayList    = []
+        Process.cachedTags  = []   
         
         self.curSelc        = self.tagsDrop.GetValue()[:4]
         self.checked        = self.tagCLBox.GetChecked()
-        Process.cachedTags  = []        
         
         self.changedLBox.Clear()
         self.tagCLBox.Clear()
@@ -356,12 +361,12 @@ class Process(wx.Panel):
     # self.preBtn           
     def loadMap(self, event):
         
-        dlg = wx.FileDialog(self, "Choose a file", os.getcwd(), "", "*.*", wx.OPEN)
+        self.filePrompt = wx.FileDialog(self, "Choose a file", os.getcwd(), "", "*.txt", wx.OPEN)
         
-        if dlg.ShowModal() == wx.ID_OK:
-            _path = dlg.GetPath()
+        if self.filePrompt.ShowModal() == wx.ID_OK:
+            _path = self.filePrompt.GetPath()
             _mypath = os.path.basename(_path)
-        dlg.Destroy()
+        self.filePrompt.Destroy()
         
         mapFile = open(_path, 'r')
         
@@ -373,8 +378,10 @@ class Process(wx.Panel):
         self.tagPairs       = {}
         self.rootPatient    = []
         
+        mapDir = str(mapFile.readline()).strip("\n")
+        MainFrame.setPath(MainFrame(), mapDir)
+        
         self.mapFile = mapFile.readlines()
-
         self.mapFile = self.chunks(self.mapFile, 3)
         
         for pat in self.mapFile:
@@ -437,6 +444,7 @@ class Process(wx.Panel):
         Process.cachedTags = []
         
         self.tagLBox.Clear()
+        self.editTc.Clear()
         
         for pat in Process.tagSet:
             if pat[0] == Process.currentPatient:
@@ -516,15 +524,17 @@ class Process(wx.Panel):
     # ------------------------------                
     def genMap(self, event):
         
-        dlg = wx.TextEntryDialog(self, "Name the Map File", "")
+        self.namePrompt = wx.TextEntryDialog(self, "Name the Map File", "")
 
-        if dlg.ShowModal() == wx.ID_OK:
-            mapFileName = dlg.GetValue()
+        if self.namePrompt.ShowModal() == wx.ID_OK:
+            mapFileName = self.namePrompt.GetValue()
             mapFileName += '.txt'
-        dlg.Destroy()
+        self.namePrompt.Destroy()
         
         mapFile = open("mapfiles/" + mapFileName, 'wb')
         
+        mapFile.write(MainFrame.sPath + "\n")
+                
         for pat in Process.tagSet:
             for line in pat:
                 line = str(line)
@@ -547,8 +557,6 @@ class Batch(wx.Panel):
 class MainFrame(wx.Frame):
     tPath = ''
     sPath = ''
-    sListing = ''
-    tListing = ''
     
     def __init__(self):
         wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))
@@ -636,26 +644,32 @@ class MainFrame(wx.Frame):
     # Handlers
     def setSource(self, event):
         
-        self.dlg = wx.DirDialog(self, "Choose the Source Directory:", style=wx.DD_DEFAULT_STYLE)
+        self.filePrompt = wx.DirDialog(self, "Choose the Source Directory:", style=wx.DD_DEFAULT_STYLE)
         
-        if self.dlg.ShowModal() == wx.ID_OK:
-            MainFrame.sPath     = self.dlg.GetPath() + '/'
-            MainFrame.sListing  = os.walk(MainFrame.sPath)
+        if self.filePrompt.ShowModal() == wx.ID_OK:
+            MainFrame.sPath = self.filePrompt.GetPath() + '/'
             self.srcTc.SetValue(MainFrame.sPath)
             
-        self.dlg.Destroy()
+        self.filePrompt.Destroy()
     
     # ------------------------------
     def setDest(self, event):
         
-        self.dlg = wx.DirDialog(self, "Choose the Target Directory:", style=wx.DD_DEFAULT_STYLE)
+        self.filePrompt = wx.DirDialog(self, "Choose the Target Directory:", style=wx.DD_DEFAULT_STYLE)
         
-        if self.dlg.ShowModal() == wx.ID_OK:
-            MainFrame.tPath     = self.dlg.GetPath() + '/'
-            MainFrame.tListing  = os.walk(MainFrame.tPath)
+        if self.filePrompt.ShowModal() == wx.ID_OK:
+            MainFrame.tPath = self.filePrompt.GetPath() + '/'
             self.tarTc.SetValue(MainFrame.tPath)
         
-        self.dlg.Destroy()
+        self.filePrompt.Destroy()
+        
+    # ------------------------------
+    def setPath(self, mapDir):
+        
+        MainFrame.sPath = mapDir
+        print MainFrame.sPath
+        
+        self.srcTc.SetValue(MainFrame.sPath)
     
     # ------------------------------
     def showP1(self, event):

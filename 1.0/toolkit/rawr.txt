@@ -1,0 +1,13 @@
+/Users/jxu1/Documents/DICOM/sample/
+B-PML000202
+{}
+[]
+Pfeiffer^Kay^E
+{}
+[]
+DPS                      
+{}
+[]
+Roger
+{}
+[]
