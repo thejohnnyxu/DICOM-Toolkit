@@ -30,14 +30,12 @@ class Process(wx.Panel):
 
         # Sizers
         self.container  = wx.BoxSizer(wx.VERTICAL)
-        
         self.hboxA  = wx.BoxSizer(wx.HORIZONTAL)
         self.vboxA1 = wx.BoxSizer(wx.VERTICAL)
         self.vboxA2 = wx.BoxSizer(wx.VERTICAL)
         self.hboxA3 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxA4 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxA5 = wx.BoxSizer(wx.HORIZONTAL)
-        
         self.hboxB  = wx.BoxSizer(wx.HORIZONTAL)
         self.vboxB1 = wx.BoxSizer(wx.VERTICAL)
         self.vboxB2 = wx.BoxSizer(wx.VERTICAL)
@@ -180,13 +178,15 @@ class Process(wx.Panel):
                     fPath = dirname + '/' + filename
                     rFile = open(fPath, 'rb').read()
                     self.byte = repr(rFile)
+                    path = dirname.split("/")
+                    folderName = path[-3]
                     if self.isDICM(self.byte, filename):
                         ds = dicom.read_file(fPath)
                         if ds.PatientsName == "":
                             self.flaggedFiles.append(fPath)
                             self.isMissing = True
                         else:
-                            logic.mapper(self, ds)
+                            logic.mapper(self, ds, folderName)
             
             if self.isMissing:
                 timeStamp           = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
@@ -205,7 +205,7 @@ class Process(wx.Panel):
             self.mapDone.ShowModal()
             self.mapDone.Destroy()
             print "F : ", Process.tagSet, logic.finalPatients
-
+            
     # ------------------------------
     # Process Button
     def process(self, event):
@@ -230,7 +230,11 @@ class Process(wx.Panel):
 
         self.done = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
         self.noMap = wx.MessageDialog(self, 'Please Map the Source Directory or Load a Map File', 'Missing Mapping!', wx.OK | wx.ICON_INFORMATION)
+        self.noDest = wx.MessageDialog(self, 'Please select a Target Directory', 'No Target Directory!', wx.OK | wx.ICON_INFORMATION)
 
+        if MainFrame.tPath == '':
+            self.noDest.ShowModal()
+            self.noDest.Destroy()
         if not Process.tagSet:
             self.noMap.ShowModal()
             self.noMap.Destroy()
@@ -243,7 +247,6 @@ class Process(wx.Panel):
                     if self.isDICM(self.byte, filename):
                         ds = dicom.read_file(fPath)
                         logic.batchProcess(self, ds, dirname, MainFrame.tPath, filename, Process.tagSet)
-            
             self.done.ShowModal()
             self.done.Destroy()
     
@@ -290,8 +293,8 @@ class Process(wx.Panel):
     # ------------------------------        
     # self.anoBtn
     def anonymize(self, event):
-        pass
-
+        MainFrame.self.srcTc.SetValue('a')
+        
     # ------------------------------    
     # Refreshes self.tagCLBox
     def refreshChecklist(self):
@@ -363,6 +366,7 @@ class Process(wx.Panel):
     # ------------------------------
     # self.preBtn           
     def loadMap(self, event):
+        global mainFrame
         
         self.filePrompt = wx.FileDialog(self, "Choose a file", os.getcwd(), "", "*.txt", wx.OPEN)
         
@@ -381,8 +385,8 @@ class Process(wx.Panel):
         self.tagPairs       = {}
         self.rootPatient    = []
         
-        MainFrame.sPath = str(mapFile.readline()).strip("\n")
-        MainFrame.setPath(MainFrame())
+        mainFrame.sPath = str(mapFile.readline()).strip("\n")
+        mainFrame.srcTc.SetValue(mainFrame.sPath)
         
         self.mapFile = mapFile.readlines()
         self.mapFile = self.chunks(self.mapFile, 3)
@@ -559,7 +563,7 @@ class Batch(wx.Panel):
 # ------------------------------
 class MainFrame(wx.Frame):
     tPath = ''
-    sPath = ''
+    sPath = '/Users/jxu1/Documents/DICOM/sample/IMPACT27C/'
     
     def __init__(self):
         wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))
@@ -572,13 +576,10 @@ class MainFrame(wx.Frame):
 
         # Sizers
         self.container = wx.BoxSizer(wx.VERTICAL)
-        
         self.hboxA  = wx.BoxSizer(wx.HORIZONTAL)
         self.vboxA1 = wx.BoxSizer(wx.VERTICAL)
         self.vboxA2 = wx.BoxSizer(wx.VERTICAL)
-        
         self.hboxB = wx.BoxSizer(wx.HORIZONTAL)
-        
         self.vboxC = wx.BoxSizer(wx.VERTICAL)
         
         # Static Text
@@ -667,10 +668,6 @@ class MainFrame(wx.Frame):
         self.filePrompt.Destroy()
         
     # ------------------------------
-    def setPath(self):
-        self.tarTc.WriteText(MainFrame.sPath)
-    
-    # ------------------------------
     def showP1(self, event):
         self.panel_one.SetPosition((0,127))
         self.panel_one.Show()
@@ -704,7 +701,7 @@ def _genTags():
             
 # ------------------------------
 if __name__ == "__main__":
-    global baseTags
+    global baseTags, mainFrame
     
     _genTags()
     
@@ -714,5 +711,6 @@ if __name__ == "__main__":
             Process.cachedTags.append(pair[1])
     
     app = wx.App(0)
-    MainFrame().Show()
+    mainFrame = MainFrame()
+    mainFrame.Show()
     app.MainLoop()

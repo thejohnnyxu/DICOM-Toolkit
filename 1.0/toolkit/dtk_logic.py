@@ -6,7 +6,7 @@ class Logic():
     finalPatients = []
 
     # ------------------------------
-    def mapper(self, parent, dataset):
+    def mapper(self, parent, dataset, folderName):
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
 
         ui = parent
@@ -15,27 +15,29 @@ class Logic():
         for data_element in dataset:
             try:
                 _name   = dataset.PatientsName
-                if _name not in Logic.finalPatients:
-                    Logic.finalPatients.append(_name)
+                _fldrName = folderName[:7]
+                patID = [_name, _fldrName]
+                if patID[0] not in Logic.finalPatients:
+                    Logic.finalPatients.append(patID)
             except AttributeError:
                 break     
 
         # Populates patientDrop in Process
         ui.patientDrop.Clear()
         for patID in Logic.finalPatients:
-            ui.patientDrop.Append(patID)
+            ui.patientDrop.Append(patID[0])
         
     # ------------------------------    
     def genTagSets(self, ui):
-        for pat in Logic.finalPatients:
-            print 'Final Patients : ', pat
-            self.patientID      = pat
+        for patID in Logic.finalPatients:
+            self.patientID      = patID
             self.tagPairs       = {}
             self.insertTags     = []
             
             rootPatient = [self.patientID, self.tagPairs, self.insertTags]
             
             if rootPatient not in ui.tagSet:
+                print "Adding to tagSet : ", rootPatient
                 ui.tagSet.append(rootPatient)
                 
             Logic.finalPatients = []
