@@ -3,33 +3,44 @@
 import sys, os, dicom, wx
 # ------------------------------
 class Logic():
-    finalPatients = []
-
+    finalPatients   = {}
+    tmpPatients     = []
+    
     # ------------------------------
     def mapper(self, parent, dataset, folderName):
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
 
         ui = parent
+
         
         # Creates each group node for each patient
         for data_element in dataset:
             try:
-                _name   = dataset.PatientsName
-                _fldrName = folderName[:7]
-                patID = [_name, _fldrName]
-                if patID[0] not in Logic.finalPatients:
-                    Logic.finalPatients.append(patID)
+                name        = dataset.PatientsName
+                folderName  = folderName
+                patient     = [folderName, name]
+                
+                Logic.tmpPatients.append(patient)
             except AttributeError:
-                break     
+                break
+                
+    # ------------------------------    
+    def genTagSets(self, parent):
 
+        ui = parent
+
+        for pat in Logic.tmpPatients:
+            if not Logic.finalPatients.has_key(pat[0]):
+                Logic.finalPatients[pat[0]] = [pat[1]]
+            if pat[1] not in Logic.finalPatients[pat[0]]:
+                Logic.finalPatients[pat[0]].append(pat[1])
+                
         # Populates patientDrop in Process
         ui.patientDrop.Clear()
-        for patID in Logic.finalPatients:
-            ui.patientDrop.Append(patID[0])
+        for pat in Logic.finalPatients.keys():
+            ui.patientDrop.Append(pat)
         
-    # ------------------------------    
-    def genTagSets(self, ui):
-        for patID in Logic.finalPatients:
+        for patID in Logic.finalPatients.items():
             self.patientID      = patID
             self.tagPairs       = {}
             self.insertTags     = []
@@ -37,7 +48,6 @@ class Logic():
             rootPatient = [self.patientID, self.tagPairs, self.insertTags]
             
             if rootPatient not in ui.tagSet:
-                print "Adding to tagSet : ", rootPatient
                 ui.tagSet.append(rootPatient)
                 
             Logic.finalPatients = []
@@ -87,72 +97,71 @@ class Logic():
     # ------------------------------
     def batchProcess(self, parent, dataset, dirname, tPath, filename, tagSet):
         
-        patients = []
-        
-        ui = parent
-        
-        tagLoc = 0x10a0
+        patients    = []
+        ui          = parent
+        tagLoc      = 0x10a0
+        timePoint   = dirname.split("/")[-3][-2:]
+        origName    = dataset.PatientsName
         
         # Clears Private Tags
         if ui.removePrivate:
             dataset.remove_private_tags()
-            
-        for data_element in dataset:    
-            try:    
-                self.currentDS = dataset.PatientsName
-            
+        
+        try:
+            for data_element in dataset:
                 for pat in tagSet:
-                    if pat[0] == self.currentDS:
-                        _name = pat[0]
-                        for tag in pat[1].items():
-                            if tag[0] == "Patient's Name":
-                                _name = tag[1]
-                        for tag in pat[1].items():
+                    _patientName = pat[0][1]
+                    
+                    _changes = pat[1]
+                    _comments = pat[2]
+                    if _patientName == origName:
+                        for tag in _changes.items():
                             if tag[0] == data_element.name:
                                 data_element.value = tag[1]
-                        for value in pat[2]:
+                        for comment in _comments:
                             tagLoc += 1
-                            dataset.AddNew([0x0045, tagLoc], 'UT', value)
-                    tagLoc = 0x10a0
-            
-                if "StudyDescription" in dataset:
-                    _stDesc = dataset.StudyDescription
-                else:    
-                    _stDesc = ""
-                if "StudyDate" in dataset:
-                    _stID   = dataset.StudyDate
-                else:    
-                    _stID   = ""    
-                if "SeriesDescription" in dataset:
-                    _srDesc = dataset.SeriesDescription
-                else:    
-                    _srDesc = ""
-                if "SeriesDate" in dataset:
-                    _srNum  = str(dataset.SeriesDate)
-                else:    
-                    _srNum = ""
-                if "SeriesTime" in dataset:
-                    _srTime = str(dataset.SeriesTime)
-                else:
-                    _srTime = ""
+                            dataset.AddNew([0x0045, tagLoc], 'UT', comment)
+                            
+                        if "StudyDescription" in dataset:
+                            _stDesc = dataset.StudyDescription
+                        else:    
+                            _stDesc = ""
+                        if "StudyDate" in dataset:
+                            _stID   = dataset.StudyDate
+                        else:    
+                            _stID   = ""    
+                        if "SeriesDescription" in dataset:
+                            _srDesc = dataset.SeriesDescription
+                        else:    
+                            _srDesc = ""
+                        if "SeriesDate" in dataset:
+                            _srNum  = str(dataset.SeriesDate)
+                        else:    
+                            _srNum = ""
+                        if "SeriesTime" in dataset:
+                            _srTime = str(dataset.SeriesTime)
+                        else:
+                            _srTime = ""
                 
-                patient = (_name, _stDesc, _stID, _srDesc, _srNum, _srTime)
+                        patient = (_patientName, _stDesc, _stID, _srDesc, _srNum, _srTime)
+                        
+                        if patient not in patients:
+                            patients.append(patient)                    
+        except:
+            pass    
 
-                if patient not in patients:
-                    patients.append(patient)
-            except AttributeError:
-                break
-                
         # Creates the folder hierarchy
         try:
             for dirs in os.walk(tPath):
                 for subdirs in dirs:
                     for patient in patients:
                         _lvl1 = patient[0]
+                        if "/" in _lvl1:
+                            _lvl1 = _lvl1.replace("/", "-")
                         _lvl2 = patient[1] + "_" + patient[2]
                         _lvl3 = patient[3] + "_" + patient[4] + "_" + patient[5]
                         dir1 = tPath + _lvl1
-                        dir2 = dir1 + "/" + _lvl2
+                        dir2 = dir1 + "/" + _lvl2 + "_" + timePoint
                         dir3 = dir2 + "/" + _lvl3
                         if not os.path.exists(dir1):
                             os.makedirs(dir1)

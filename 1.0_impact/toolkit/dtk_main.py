@@ -380,7 +380,6 @@ class Process(wx.Panel):
         self.patientDrop.Clear()
         
         Process.tagSet      = []
-        self.tmpFile        = []
         self.patientName    = ""
         self.tagPairs       = {}
         self.rootPatient    = []
@@ -392,7 +391,7 @@ class Process(wx.Panel):
         self.mapFile = self.chunks(self.mapFile, 3)
         
         for pat in self.mapFile:
-            self.patientName    = parser.parseCode(pat[0])
+            self.patientName    = parser.parseID(pat[0])
             self.tagPairs       = parser.parseCode(pat[1])
             self.insertTags     = parser.parseCode(pat[2])
             
@@ -401,7 +400,7 @@ class Process(wx.Panel):
             Process.tagSet.append(self.rootPatient)
 
         for pat in Process.tagSet:
-            self.patientDrop.Append(pat[0])
+            self.patientDrop.Append(pat[0][0])
    
         self.refreshChecklist()
         mapFile.close()
@@ -454,7 +453,7 @@ class Process(wx.Panel):
         self.editTc.Clear()
         
         for pat in Process.tagSet:
-            if pat[0] == Process.currentPatient:
+            if pat[0][0] == Process.currentPatient:
                 Process.editPair    = pat[1]
                 Process.insertTags  = pat[2]
                 
@@ -492,7 +491,9 @@ class Process(wx.Panel):
         if self.tagCLBox.IsChecked(self.id):
             Process.editPair[self.tag] = ''
         else:
-            Process.editPair.remove(self.tag)
+            del Process.editPair[self.tag]
+            
+        self.refreshChecklist()
             
     # ------------------------------
     # self.addBtn
@@ -543,11 +544,11 @@ class Process(wx.Panel):
         mapFile.write(MainFrame.sPath + "\n")
                 
         for pat in Process.tagSet:
-            for line in pat:
-                line = str(line)
-                line = line.replace("u'", "'")
-                line = line.replace('u"', '"')
-                mapFile.write(line + "\n")
+            mapFile.write(pat[0][0] + " | ")
+            for element in pat[0][1]:
+                mapFile.write(element + " | ")
+            mapFile.write("\n" + str(pat[1]))
+            mapFile.write("\n" + str(pat[2]) + "\n")
                 
         mapFile.close()
         
@@ -562,8 +563,8 @@ class Batch(wx.Panel):
         
 # ------------------------------
 class MainFrame(wx.Frame):
-    tPath = ''
-    sPath = '/Users/jxu1/Documents/DICOM/sample/'
+    tPath = '/Users/jxu1/Documents/DICOM/dump/'
+    sPath = '/Users/jxu1/Documents/IMPACT DVD Dump/1/IMPACT05C/'
     
     def __init__(self):
         wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))

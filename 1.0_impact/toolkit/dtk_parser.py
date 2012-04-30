@@ -46,8 +46,21 @@ class Parser():
             return ret
         except:
             return text
-
-
+            
+    def parseID(self, text):
+        p = []
+        
+        text = text.strip("\n")
+        
+        elements = text.split(" | ")
+        
+        subjectID = elements[0]
+        name = elements[1]
+        
+        p = [subjectID, name]
+        
+        return p
+        
     def parseCode(self, text):
         '''Parse a string into a dictionary, number, or string'''
         if text == "":
@@ -71,6 +84,8 @@ class Parser():
             return self.parseList(text)
         elif text[0] == "[" and text[len(text) - 1] == "]" and len(text) == 2:
             return e
+        elif text[0] == "(" and text[len(text) - 1] == ")":
+            return self.parseTuple(text)
         #if it is a special string character in python language,
         #simply return the text without the " character or the ' character
         #at the beginning and end
