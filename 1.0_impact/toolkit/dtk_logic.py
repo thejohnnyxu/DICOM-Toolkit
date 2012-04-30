@@ -10,7 +10,6 @@ class Logic():
         # PatientsName/ StudyDescription + StudyDate/ SeriesDescription + SeriesDate + SeriesTime/
 
         ui = parent
-        self.tempPatients
         
         # Creates each group node for each patient
         for data_element in dataset:
@@ -18,12 +17,10 @@ class Logic():
                 _name   = dataset.PatientsName
                 _fldrName = folderName[:7]
                 patID = [_name, _fldrName]
-                if patID[0] not in self.tempPatients
-                    self.tempPatients.append(patID)
+                if patID[0] not in Logic.finalPatients:
+                    Logic.finalPatients.append(patID)
             except AttributeError:
-                break
-                
-        Logic.finalPatients = list(set(self.tempPatients))
+                break     
 
         # Populates patientDrop in Process
         ui.patientDrop.Clear()
