@@ -50,7 +50,7 @@ class Process(wx.Panel):
         self.batBtn = wx.Button(self, 106, "Batch Process", size=(150,25))
         self.mapBtn = wx.Button(self, 107, "Map", size=(150,25))
         self.genBtn = wx.Button(self, 108, "Save Map", size=(150,25))
-        self.anoBtn = wx.Button(self, 109, "Anonymize", size=(150,25))
+        self.anoBtn = wx.Button(self, 109, "Preset", size=(150,25))
         self.cnlBtn = wx.Button(self, 110, "Remove Edit", size=(380,25))
         
         # Text Ctrl
@@ -130,7 +130,7 @@ class Process(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.batch,        id=106)
         self.Bind(wx.EVT_BUTTON, self.mapper,       id=107)
         self.Bind(wx.EVT_BUTTON, self.genMap,       id=108)
-        self.Bind(wx.EVT_BUTTON, self.anonymize,    id=109)
+        self.Bind(wx.EVT_BUTTON, self.preset,    id=109)
         self.Bind(wx.EVT_BUTTON, self.removeEdit,   id=110)
         self.Bind(wx.EVT_CHECKLISTBOX, self.flag,   id=151)
         self.Bind(wx.EVT_LISTBOX, self.clicked,     id=151)
@@ -143,7 +143,6 @@ class Process(wx.Panel):
         # Initial Settings
         self.SetSizer(self.container)
         self.privateCheck.SetValue(True)
-        self.removePrivate = True
         self.tagsDrop.SetValue('0010 : Patient Information')
         self.patientDrop.SetValue('Patients List')
     
@@ -154,12 +153,10 @@ class Process(wx.Panel):
     def mapper(self, event):
         global baseTags
         
-        print "I : ", Process.tagSet, logic.finalPatients
         Process.editPair    = {}
         Process.tagSet      = []
         self.flaggedFiles   = []
         self.isMissing           = False
-        print "A : ", Process.tagSet, logic.finalPatients
         
         self.patientDrop.Clear()
         
@@ -204,7 +201,6 @@ class Process(wx.Panel):
             
             self.mapDone.ShowModal()
             self.mapDone.Destroy()
-            print "F : ", Process.tagSet, logic.finalPatients
             
     # ------------------------------
     # Process Button
@@ -292,9 +288,30 @@ class Process(wx.Panel):
             
     # ------------------------------        
     # self.anoBtn
-    def anonymize(self, event):
-        MainFrame.self.srcTc.SetValue('a')
+    def preset(self, event):
         
+        self.done = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
+        self.noMap = wx.MessageDialog(self, 'Please Map the Source Directory or Load a Map File', 'Missing Mapping!', wx.OK | wx.ICON_INFORMATION)
+        self.noDest = wx.MessageDialog(self, 'Please select a Target Directory', 'No Target Directory!', wx.OK | wx.ICON_INFORMATION)
+
+        if MainFrame.tPath == '':
+            self.noDest.ShowModal()
+            self.noDest.Destroy()
+        if not Process.tagSet:
+            self.noMap.ShowModal()
+            self.noMap.Destroy()
+        else:
+            for dirname, dirs, files, in os.walk(MainFrame.sPath):
+                for filename in files:
+                    fPath = dirname + '/' + filename
+                    rFile = open(fPath, 'rb').read()
+                    self.byte = repr(rFile)
+                    if self.isDICM(self.byte, filename):
+                        ds = dicom.read_file(fPath)
+                        logic.presetProcess(self, ds, dirname, MainFrame.tPath, filename, Process.tagSet)
+            self.done.ShowModal()
+            self.done.Destroy()
+
     # ------------------------------    
     # Refreshes self.tagCLBox
     def refreshChecklist(self):
@@ -544,11 +561,15 @@ class Process(wx.Panel):
         mapFile.write(MainFrame.sPath + "\n")
                 
         for pat in Process.tagSet:
+            editPair = str(pat[1]).replace("u'", "'")
+            editPair = editPair.replace('u"', '"')
+            comments = str(pat[2]).replace("u'", "'")
+            comments = comments.replace('u"', '"')
+            
             mapFile.write(pat[0][0] + " | ")
-            for element in pat[0][1]:
-                mapFile.write(element + " | ")
-            mapFile.write("\n" + str(pat[1]))
-            mapFile.write("\n" + str(pat[2]) + "\n")
+            mapFile.write(str(pat[0][1])[2:-2] + " | ")
+            mapFile.write("\n" + editPair)
+            mapFile.write("\n" + comments + "\n")
                 
         mapFile.close()
         
@@ -564,7 +585,7 @@ class Batch(wx.Panel):
 # ------------------------------
 class MainFrame(wx.Frame):
     tPath = '/Users/jxu1/Documents/DICOM/dump/'
-    sPath = '/Users/jxu1/Documents/IMPACT DVD Dump/1/IMPACT05C/'
+    sPath = '/Users/jxu1/Documents/DICOM/sample/'
     
     def __init__(self):
         wx.Frame.__init__(self, None, title="DICOM Toolkit", size=(800,705))
