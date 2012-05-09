@@ -1,0 +1,302 @@
+Group Length
+Specific Character Set
+Image Type
+SOP Class UID
+SOP Instance UID
+Study Date
+Series Date
+Acquisition Date
+Content Date
+Study Time
+Series Time
+Acquisition Time
+Content Time
+Accession Number
+Modality
+Manufacturer
+Institution Name
+Referring Physician's Name
+Station Name
+Study Description
+Series Description
+Name of Physician(s) Reading Study
+Operators' Name
+Manufacturer's Model Name
+Private Creator
+Private tag data
+[Full fidelity]
+[Suite id]
+[Product id]
+[Image actual date]
+[Service id]
+[Mobile location number]
+[Equipment UID]
+[Genesis Version - now]
+[Exam Record checksum]
+[Actual series data time stamp]
+Patient's Name
+Patient ID
+Patient's Birth Date
+Patient's Sex
+Patient's Age
+Patient's Weight
+Additional Patient History
+[Patient Status]
+Scanning Sequence
+Sequence Variant
+Scan Options
+MR Acquisition Type
+Angio Flag
+Slice Thickness
+Repetition Time
+Echo Time
+Number of Averages
+Imaging Frequency
+Imaged Nucleus
+Echo Number(s)
+Magnetic Field Strength
+Spacing Between Slices
+Echo Train Length
+Percent Sampling
+Percent Phase Field of View
+Pixel Bandwidth
+Device Serial Number
+Software Version(s)
+Spatial Resolution
+Heart Rate
+Cardiac Number of Images
+Trigger Window
+Reconstruction Diameter
+Receive Coil Name
+Transmit Coil Name
+Acquisition Matrix
+In-plane Phase Encoding Direction
+Flip Angle
+Variable Flip Angle Flag
+SAR
+Patient Position
+[Horiz. Frame of ref.]
+[Series contrast]
+[Last pseq]
+[Series plane]
+[First scan ras]
+[First scan location]
+[Last scan ras]
+[Last scan loc]
+[Display field of view]
+[Acquisition Duration]
+[Second echo]
+[Number of echoes]
+[Table delta]
+[Contiguous]
+[Peak SAR]
+[Monitor SAR]
+[Cardiac repetition time]
+[Images per cardiac cycle]
+[Actual receive gain analog]
+[Actual receive gain digital]
+[Delay after trigger]
+[Swappf]
+[Pause Interval]
+[Pause Time]
+[Slice offset on freq axis]
+[Auto Prescan Center Frequency]
+[Auto Prescan Transmit Gain]
+[Auto Prescan Analog receiver gain]
+[Auto Prescan Digital receiver gain]
+[Bitmap defining CVs]
+[Center freq. Method]
+[Pulse Sequence Mode]
+[Pulse Sequence Name]
+[Pulse Sequence Date]
+[Internal Pulse Sequence Name]
+[Transmitting Coil Type]
+[Surface Coil Type]
+[Extremity Coil flag]
+[Raw data run number]
+[Calibrated Field strength]
+[SAT fat/water/bone]
+[User data 0]
+[User data 1]
+[User data 2]
+[User data 3]
+[User data 4]
+[User data 5]
+[User data 6]
+[User data 7]
+[User data 8]
+[User data 9]
+[User data 10]
+[User data 11]
+[User data 12]
+[User data 13]
+[User data 14]
+[User data 15]
+[User data 16]
+[User data 17]
+[User data 18]
+[User data 19]
+[User data 20]
+[User data 21]
+[User data 22]
+[Projection angle]
+[Saturation planes]
+[Surface coil intensity]
+[SAT location R]
+[SAT location L]
+[SAT location A]
+[SAT location P]
+[SAT location H]
+[SAT location F]
+[SAT thickness R/L]
+[SAT thickness A/P]
+[SAT thickness H/F]
+[Phase Contrast flow axis]
+[Velocity encoding]
+[Thickness disclaimer]
+[Prescan type]
+[Prescan status]
+[Projection Algorithm]
+[Projection Algorithm Name]
+[Fractional echo]
+[Cardiac phase number]
+[Variable echoflag]
+[Concatenated SAT {# DTI Diffusion Dir., release 9.0 & below}]
+[User data 23 {# DTI Diffusion Dir., release 9.0 & below}]
+[User data 24 {# DTI Diffusion Dir., release 10.0 & above}]
+[Velocity Encode Scale]
+[Fast phases]
+[Transmit gain]
+Study Instance UID
+Series Instance UID
+Study ID
+Series Number
+Acquisition Number
+Instance Number
+Image Position (Patient)
+Image Orientation (Patient)
+Frame of Reference UID
+Laterality
+Temporal Resolution
+Position Reference Indicator
+Slice Location
+[Series from which Prescribed]
+[Series Record checksum]
+[Genesis version - Now]
+[Acq recon record checksum]
+[Series from which prescribed]
+[Image from which prescribed]
+[Screen Format]
+[Locations in acquisition]
+[Graphically prescribed]
+[Rotation from source x rot]
+[Rotation from source y rot]
+[Rotation from source z rot]
+[Num 3D slabs]
+[Locs per 3D slab]
+[Overlaps]
+[Image Filtering 0.5/0.2T]
+[Diffusion direction]
+[Tagging Flip Angle]
+[Tagging Orientation]
+[Tag Spacing]
+[RTIA_timer]
+[Fps]
+[Auto window/level alpha]
+[Auto window/level beta]
+[Auto window/level window]
+[Auto window/level level]
+[Start time(secs) in first axial]
+[No. of updates to header]
+[Indicates study has complete info (DICOM/genesis)]
+[Last pulse sequence used]
+[Images in Series]
+[Landmark Counter]
+[Number of Acquisitions]
+[Indicates no. of updates to header]
+[Series Complete Flag]
+[Number of images archived]
+[Last image number used]
+[Primary Receiver Suite and Host]
+[Image archive flag]
+[Scout Type]
+[Foreign Image Revision]
+[Imaging Mode]
+[Pulse Sequence]
+[Imaging Options]
+[Plane Type]
+[Oblique Plane]
+[RAS letter of image location]
+[Image location]
+[Center R coord of plane image]
+[Center A coord of plane image]
+[Center S coord of plane image]
+[Normal R coord]
+[Normal A coord]
+[Normal S coord]
+[R Coord of Top Right Corner]
+[A Coord of Top Right Corner]
+[S Coord of Top Right Corner]
+[R Coord of Bottom Right Corner]
+[A Coord of Bottom Right Corner]
+[S Coord of Bottom Right Corner]
+[Image dimension - X]
+[Image dimension - Y]
+[Number of Excitations]
+Samples per Pixel
+Photometric Interpretation
+Rows
+Columns
+Pixel Spacing
+Bits Allocated
+Bits Stored
+High Bit
+Pixel Representation
+Pixel Padding Value
+Window Center
+Window Width
+[Lower range of Pixels1]
+[Upper range of Pixels1]
+[Lower range of Pixels2]
+[Upper range of Pixels2]
+[Version of the hdr struct]
+[Advantage comp. Overflow]
+[Advantage comp. Underflow]
+[Bitmap of prescan options]
+[Gradient offset in X]
+[Gradient offset in Y]
+[Gradient offset in Z]
+[Number of EPI shots]
+[Views per segment]
+[Respiratory rate, bpm]
+[Respiratory trigger point]
+[Type of receiver used]
+[DB/dt Peak rate of change of gradient field]
+[dB/dt Limits in units of percent]
+[PSD estimated limit]
+[PSD estimated limit in tesla per second]
+[Saravghead]
+[Window value]
+[GE image integrity]
+[Level value]
+[Unique image iden]
+[Histogram tables]
+[User defined data]
+[Effective echo spacing]
+[Filter Mode (String slop field 1 in legacy GE MR]
+[String slop field 2]
+[Image Type (real, imaginary, phase, magnitude)]
+[Vas collapse flag]
+[Vas flags]
+[Neg_scanspacing]
+[Offset Frequency]
+[User_usage_tag]
+[User_fill_map_MSW]
+[User_fill_map_LSW]
+[User data 25...User data 48 {User48=Effective Resolution for spiral}]
+[Slop_int_6... slop_int_9]
+[Slop_int_10...slop_int_17]
+Pixel Data
+Length to End
+Contrast/Bolus Agent
+Sequence Name

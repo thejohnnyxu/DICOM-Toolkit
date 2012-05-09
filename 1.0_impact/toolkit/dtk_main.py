@@ -156,7 +156,7 @@ class Process(wx.Panel):
         Process.editPair    = {}
         Process.tagSet      = []
         self.flaggedFiles   = []
-        self.isMissing           = False
+        self.isMissing      = False
         
         self.patientDrop.Clear()
         
@@ -290,27 +290,16 @@ class Process(wx.Panel):
     # self.anoBtn
     def preset(self, event):
         
-        self.done = wx.MessageDialog(self, 'Batch Processing Done.', 'Notice!', wx.OK | wx.ICON_INFORMATION)
-        self.noMap = wx.MessageDialog(self, 'Please Map the Source Directory or Load a Map File', 'Missing Mapping!', wx.OK | wx.ICON_INFORMATION)
-        self.noDest = wx.MessageDialog(self, 'Please select a Target Directory', 'No Target Directory!', wx.OK | wx.ICON_INFORMATION)
-
-        if MainFrame.tPath == '':
-            self.noDest.ShowModal()
-            self.noDest.Destroy()
-        if not Process.tagSet:
-            self.noMap.ShowModal()
-            self.noMap.Destroy()
-        else:
-            for dirname, dirs, files, in os.walk(MainFrame.sPath):
-                for filename in files:
-                    fPath = dirname + '/' + filename
-                    rFile = open(fPath, 'rb').read()
-                    self.byte = repr(rFile)
-                    if self.isDICM(self.byte, filename):
-                        ds = dicom.read_file(fPath)
-                        logic.presetProcess(self, ds, dirname, MainFrame.tPath, filename, Process.tagSet)
-            self.done.ShowModal()
-            self.done.Destroy()
+        for dirname, dirs, files, in os.walk(MainFrame.sPath):
+            for filename in files:
+                fPath = dirname + '/' + filename
+                rFile = open(fPath, 'rb').read()
+                self.byte = repr(rFile)
+                if self.isDICM(self.byte, filename):
+                    ds = dicom.read_file(fPath)
+                    logic.presetProcess(self, ds, dirname, MainFrame.tPath, filename, Process.tagSet)
+                    
+        print 'Done!'
 
     # ------------------------------    
     # Refreshes self.tagCLBox

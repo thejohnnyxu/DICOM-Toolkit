@@ -1,0 +1,286 @@
+/Users/jxu1/Documents/IMPACT DVD Dump/5/
+128-001-JLT-12 | JLT29APR59 | 
+{}
+[]
+128-004-RDM-00 | RDM24JUN47 | 
+{}
+[]
+131-002-WRC-12 | 131 002 WRC | 
+{}
+[]
+307-018-U-B-00 | U-B C97-830 | 
+{}
+[]
+123-013-SJP-12 | PETRILLI, SYDNEY JO | 
+{}
+[]
+116-015-EAS-12 | EAS | 
+{}
+[]
+119-008-DJL-00 | johnson-lanholm,debbie | 
+{}
+[]
+119-004-LJM-12 | LJM 119-004 | 
+{}
+[]
+128-012-CSB-00 | CSB22OCT49 | 
+{}
+[]
+116-013-JCR-00 | JCR | 
+{}
+[]
+123-012-LAC-12 | CIESLAK, LOIS A | 
+{}
+[]
+111-012-LJM-00 | LJM | 
+{}
+[]
+121-004-AJB-00 | AJB | 
+{}
+[]
+128-011-JWB-12 | JWB02DEC55 | 
+{}
+[]
+128-009-DAP-00 | DAP27FEB40 | 
+{}
+[]
+119-012-AHG-12 | AHG | 
+{}
+[]
+307-018-U-B-12 | C97-830 U-B | 
+{}
+[]
+128-010-KAL-12 | KAL04DEC60 | 
+{}
+[]
+119-008-DJL-12 | DJL | 
+{}
+[]
+108-005-CAC-00 | CELLS, CAROLE | 
+{}
+[]
+119-004-LJM-00 | mcanulty,linda | 
+{}
+[]
+116-014-CLR-12 | CLR | 
+{}
+[]
+131-001-MAH-00 | MAH | 
+{}
+[]
+111-012-LJM-12 | LJM23AUG47 | 
+{}
+[]
+121-004-AJB-12 | AJB | 
+{}
+[]
+119-014-TBP-12 | TBP 119014 | 
+{}
+[]
+128-009-DAP-12 | DAP27FEB40 | 
+{}
+[]
+119-003-PJM-00 | mariotti,peter | 
+{}
+[]
+119-005-GJT-00 | terraccino,gloria | 
+{}
+[]
+119-012-AHG-00 | gilbert, alan | 
+{}
+[]
+128-010-KAL-00 | KL 04DEC60 | 
+{}
+[]
+115-001-FHR-00 | RAY,FLETCHER | 
+{}
+[]
+108-005-CAC-12 | CELLS,CAROLE | 
+{}
+[]
+116-014-CLR-00 | CLR | 
+{}
+[]
+119-007-JMB-00 | BOOTH, JOYCE | 
+{}
+[]
+121-008-LKL-00 | LKL | 
+{}
+[]
+116-011-VJC-12 | VJC | 
+{}
+[]
+119-014-TBP-00 | palmieri, theresa | 
+{}
+[]
+128-001-JLT-00 | JLT29APR59 | 
+{}
+[]
+119-006-RMK-00 | kasian,roseanne | 
+{}
+[]
+119-003-PJM-12 | PBM 119-003 | 
+{}
+[]
+128-011-JWB-00 | JWB1477305 | 
+{}
+[]
+119-005-GJT-12 | GFT 119005 | 
+{}
+[]
+119-010-GLJ-00 | JACKSON, GWENDOLYN | 
+{}
+[]
+116-011-VJC-00 | VJC | 
+{}
+[]
+119-007-JMB-12 | JMB | 
+{}
+[]
+118-013-ASB-12 | ASB | 
+{}
+[]
+121-008-LKL-12 | LKL | 
+{}
+[]
+119-006-RMK-12 | RMK | 
+{}
+[]
+122-008-CAJ-00 | CAJ   5 SEP 42 | 
+{}
+[]
+119-010-GLJ-12 | GLJ 117 010 | 
+{}
+[]
+128-006-FIK-00 | F1K30JAN38 | 
+{}
+[]
+119-011-BAR-00 | RINEER, BARBARA | 
+{}
+[]
+121-010-BSG-12 | BSG | 
+{}
+[]
+119-013-RBS-12 | RBS 119013 | 
+{}
+[]
+118-013-ASB-00 | ASB | 
+{}
+[]
+128-002-LJP-00 | LJP08NOV51 | 
+{}
+[]
+128-007-CMM-00 | MARTIN, CONN | 
+{}
+[]
+126-001-JPK-00 | JPK 03/JUL/45 | 
+{}
+[]
+128-008-LAR-12 | LAR03JUL41 | 
+{}
+[]
+119-011-BAR-12 | BAR | 
+{}
+[]
+119-001-DAH-00 | hamalainen,deborah | 
+{}
+[]
+122-008-CAJ-12 | CAJ 5 SEP 42 | 
+{}
+[]
+121-011-CKM-00 | CKM | 
+{}
+[]
+128-006-FIK-12 | FIKJAN3038 | 
+{}
+[]
+116-009-IEJ-00 | IEJ | 
+{}
+[]
+119-013-RBS-00 | STUMP, RONALD | 
+{}
+[]
+128-007-CMM-12 | CMM23JAN48 | 
+{}
+[]
+128-002-LJP-12 | LJP08OCT51 | 
+{}
+[]
+126-001-JPK-12 | JPK | 
+{}
+[]
+116-010-LJC-12 | CEISNER,LINDA | 
+{}
+[]
+128-008-LAR-00 | LAR03JUL41 | 
+{}
+[]
+119-001-DAH-12 | DJH-12-31-52-F | 
+{}
+[]
+116-012-PCC-00 | PTC | 
+{}
+[]
+121-011-CKM-12 | CKM | 
+{}
+[]
+116-009-IEJ-12 | IEJ | 
+{}
+[]
+124-006-TJD-00 | DOANE, TIMOTHY J. | 
+{}
+[]
+128-003-CJJ-00 | CJJ04MAY36 | 
+{}
+[]
+116-013-JCR-12 | JCR | 
+{}
+[]
+111-011-VRM-12 | VRM02JUL51 | 
+{}
+[]
+125-005-CDV-12 | CDV  21-JUL-58 | 
+{}
+[]
+121-010-BSG-00 | BSG | 
+{}
+[]
+116-010-LJC-00 | LJC | 
+{}
+[]
+116-012-PCC-12 | PTC | 
+{}
+[]
+119-009-VLS-00 | simmons, vivienne | 
+{}
+[]
+128-004-RDM-12 | RDM24JUN47 | 
+{}
+[]
+131-002-WRC-00 | C97-830 | 
+{}
+[]
+123-013-SJP-00 | PETRILLI,SYDNEY | 
+{}
+[]
+116-015-EAS-00 | EAS | 
+{}
+[]
+124-006-TJD-12 | DOANE, TIMOTHY | 
+{}
+[]
+128-003-CJJ-12 | CJJO4MAY36 | 
+{}
+[]
+128-012-CSB-12 | CSB22OCT49 | 
+{}
+[]
+111-011-VRM-00 | VRM | 
+{}
+[]
+125-005-CDV-00 | CDV  21-JUL-58 | 
+{}
+[]
+123-012-LAC-00 | CLESLAK,LOIS | 
+{}
+[]

@@ -48,6 +48,7 @@ class Logic():
             rootPatient = [self.patientID, self.tagPairs, self.insertTags]
             
             if rootPatient not in ui.tagSet:
+                print rootPatient
                 ui.tagSet.append(rootPatient)
                 
             Logic.finalPatients = []
@@ -55,73 +56,69 @@ class Logic():
     # ------------------------------
     def presetProcess(self, parent, dataset, dirname, tPath, filename, tagSet):
         
+        toBlank = ["Institution Address", "Referring Physician's Name", "Referring Physician's Address",
+                   "Referring Physician's Telephone Numbers", "Referring Physician Identification Sequence", "Institutional Department Name",
+                   "Physician(s) of Record", "Performing Physician's Name", "Name of Physician(s) Reading Study", "Operators' Name",
+                   "Issuer of Patient ID", "Patient's Insurance Plan Code Sequence", "Other Patient IDs",
+                   "Other Patient Names", "Other Patient IDs Sequence", "Patient's Birth Name", "Patient's Address",
+                   "Insurance Plan Identification", "Patient's Mother's Birth Name", "Military Rank", "Branch of Service",
+                   "Medical Record Locator", "Patient's Telephone Number"]
+        
         patients    = []
         ui          = parent
         timePoint   = dirname.split("/")[-3][-2:]
-        origName    = dataset.PatientsName
+        path        = dirname.split("/")
+        folderName  = path[-3]
+        newName     = folderName[:7]
+        pId         = "C97-830_" + newName
         
-        # Clears Private Tags
-        if ui.removePrivate:
-            dataset.remove_private_tags()
+        dataset.remove_private_tags()
         
-        try:
-            for data_element in dataset:
-                for pat in tagSet:
-                    _patientName = pat[0][1]
-                    _newName = pat[0][0][:7]
-                    _changes = pat[1]
-                    _comments = pat[2]
-                    if _patientName == origName:
-                        for tag in _changes.items():
-                            if tag[0] == data_element.name:
-                                data_element.value = tag[1]
-                        for comment in _comments:
-                            tagLoc += 1
-                            dataset.AddNew([0x0045, tagLoc], 'UT', comment)
-                        
-                        # Biogen Specs
-                        dataset.PatientsName                = _newName
-                        dataset.ClinicalTrialSponsorName    = "Biogen"
-                        dataset.ClinicalTrialProtocolID     = "C97-830"
-                        dataset.ClinicalTrialProtocolName   = "IMPACT"
-                        dataset.ClinicalTrailSiteID         = _newName[:3]
-                        dataset.ClinicalTrialSubjectID      = _newName
-                        
-                        if pat[0][0][-2:] == "00":
-                            dataset.ClinicalTrialTimePointDescription = "BASELINE"
-                        elif pat[0][0][-2:] == "12":
-                            dataset.ClinicalTrialTimePointDescription = "Month 12"
-                        elif pat[0][0][-2:] == "24":
-                            dataset.ClinicalTrialTimePointDescription = "Month 24"
-                            
-                        # Folder Structure    
-                        if "StudyDescription" in dataset:
-                            _stDesc = dataset.StudyDescription
-                        else:    
-                            _stDesc = ""
-                        if "StudyDate" in dataset:
-                            _stID   = dataset.StudyDate
-                        else:    
-                            _stID   = ""    
-                        if "SeriesDescription" in dataset:
-                            _srDesc = dataset.SeriesDescription
-                        else:    
-                            _srDesc = ""
-                        if "SeriesDate" in dataset:
-                            _srNum  = str(dataset.SeriesDate)
-                        else:    
-                            _srNum = ""
-                        if "SeriesTime" in dataset:
-                            _srTime = str(dataset.SeriesTime)
-                        else:
-                            _srTime = ""
+        dataset.PatientsName                = newName
+        dataset.PatientID                   = pId
+        dataset.ClinicalTrialSponsorName    = "Biogen"
+        dataset.ClinicalTrialProtocolID     = "C97-830"
+        dataset.ClinicalTrialProtocolName   = "IMPACT"
+        dataset.ClinicalTrailSiteID         = newName[:3]
+        dataset.ClinicalTrialSubjectID      = newName
+        
+        if timePoint == "00":
+            dataset.ClinicalTrialTimePointDescription = "BASELINE"
+        elif timePoint == "12":
+            dataset.ClinicalTrialTimePointDescription = "Month 12"
+        elif timePoint == "24":
+            dataset.ClinicalTrialTimePointDescription = "Month 24"
+        
+        for data_element in dataset:
+            for tag in toBlank:
+                if tag == data_element.name:
+                    data_element.value = ''
+            
+        if "StudyDescription" in dataset:
+            _stDesc = str(dataset.StudyDescription)
+        else:    
+            _stDesc = ""
+        if "StudyDate" in dataset:
+            _stID   = str(dataset.StudyDate)
+        else:    
+            _stID   = ""    
+        if "SeriesDescription" in dataset:
+            _srDesc = str(dataset.SeriesDescription)
+        else:    
+            _srDesc = ""
+        if "SeriesDate" in dataset:
+            _srNum  = str(dataset.SeriesDate)
+        else:    
+            _srNum = ""
+        if "SeriesTime" in dataset:
+            _srTime = str(dataset.SeriesTime)
+        else:
+            _srTime = ""
                 
-                        patient = (_newName, _stDesc, _stID, _srDesc, _srNum, _srTime)
+        patient = (newName, _stDesc, _stID, _srDesc, _srNum, _srTime)
                         
-                        if patient not in patients:
-                            patients.append(patient)                    
-        except:
-            pass    
+        if patient not in patients:
+            patients.append(patient)
 
         # Creates the folder hierarchy
         try:
